@@ -61,6 +61,7 @@ class UsuarioController extends Controller
             'segundo_apellido' => $request->segundo_apellido,
             'email'            => $request->email,
             'password'         => bcrypt($request->password),
+            'must_change_password' => true,
             'esta_activo'      => true,
         ]);
 

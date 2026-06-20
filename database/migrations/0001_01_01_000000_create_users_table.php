@@ -6,9 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    //Ejecuta la migración para crear la tabla de usuarios
     public function up(): void
     {
         Schema::create('users', function (Blueprint $tabla) {
@@ -22,6 +20,7 @@ return new class extends Migration
         $tabla->string('password');
         $tabla->boolean('esta_activo')->default(true); // activo por defecto
         $tabla->rememberToken();
+        $tabla->boolean('must_change_password')->default(true);
         $tabla->timestamps();
         });
 

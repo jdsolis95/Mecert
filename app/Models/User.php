@@ -24,6 +24,7 @@ class User extends Authenticatable
         'segundo_apellido', //** */
         'email',
         'password',
+        'must_change_password',
         'esta_activo', //** */
     ];
 
@@ -47,6 +48,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'must_change_password' => 'boolean',
             'esta_activo' => 'boolean',
         ];
     }

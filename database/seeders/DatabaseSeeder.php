@@ -15,21 +15,28 @@ class DatabaseSeeder extends Seeder
         $roles = ['Administrador', 'Controller', 'Colaborador', 'Comercial'];
 
         foreach ($roles as $nombre_rol) {
-            Role::create(['name' => $nombre_rol]);
+            Role::firstOrCreate(['name' => $nombre_rol]);
         }
 
         // --- 2. Crear usuario administrador inicial ---
-        $admin = User::create([
-            'cedula'            => '000000000',
-            'name'              => 'Administrator',
-            'primer_apellido'   => 'Admin',
-            'segundo_apellido'  => 'Admin',
-            'email'             => 'Administrator@datacr.com',
-            'password'          => bcrypt('Administrator'), // contraseña temporal
-            'esta_activo'       => true,
-        ]);
+        $admin = User::updateOrCreate(
+            ['cedula' => env('ADMIN_CEDULA', '000000000')],
+            [
+                'name'              => 'Administrator',
+                'primer_apellido'   => 'Admin',
+                'segundo_apellido'  => 'Admin',
+                'email'             => env('ADMIN_EMAIL', 'Administrator@datacr.com'),
+                'password'          => env('ADMIN_PASSWORD', 'Administrator'),
+                'esta_activo'       => true,
+                'must_change_password' => true,
+            ]
+        );
 
         // --- 3. Asignar rol Administrador al usuario creado ---
-        $admin->assignRole('Administrador');
+        $admin->syncRoles(['Administrador']);
+
+        // Asegurar que los usuarios creados/actualizados por el seeder requieran cambio de contraseña
+        \App\Models\User::where('email', env('ADMIN_EMAIL', 'Administrator@datacr.com'))
+            ->update(['must_change_password' => true]);
     }
 }
