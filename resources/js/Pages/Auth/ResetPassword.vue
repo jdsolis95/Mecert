@@ -45,6 +45,7 @@ const submit = () => {
                     class="mt-1 block w-full"
                     v-model="form.email"
                     required
+                    title="Formato requerido: nombre.apellido@datacr.com"
                     autofocus
                     autocomplete="username"
                 />
@@ -61,6 +62,7 @@ const submit = () => {
                     class="mt-1 block w-full"
                     v-model="form.password"
                     required
+                    title="Mínimo 8 caracteres, una mayúscula, un número y un carácter especial."
                     autocomplete="new-password"
                 />
 
@@ -79,6 +81,7 @@ const submit = () => {
                     class="mt-1 block w-full"
                     v-model="form.password_confirmation"
                     required
+                    title="Debe coincidir con la contraseña nueva."
                     autocomplete="new-password"
                 />
 

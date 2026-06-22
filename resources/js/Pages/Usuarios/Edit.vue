@@ -2,34 +2,32 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { useForm } from '@inertiajs/vue3';
 
-defineProps({
+const props = defineProps({
+    usuario: Object,
     roles: Array,
 });
 
-// useForm maneja el estado del formulario, errores y el procesamiento de la operación
 const form = useForm({
-    cedula: '',
-    name: '',
-    primer_apellido: '',
-    segundo_apellido: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-    rol: '',
+    cedula: props.usuario.cedula,
+    name: props.usuario.name,
+    primer_apellido: props.usuario.primer_apellido,
+    segundo_apellido: props.usuario.segundo_apellido,
+    email: props.usuario.email,
+    rol: props.usuario.rol,
+    esta_activo: props.usuario.esta_activo,
 });
 
-function guardar() {
-    form.post('/usuarios');
+function actualizar() {
+    form.put(`/usuarios/${props.usuario.id}`);
 }
 </script>
 
 <template>
-    <AppLayout title="Nuevo Usuario">
+    <AppLayout title="Editar Usuario">
         <div class="p-6 max-w-2xl mx-auto">
-            <h1 class="text-2xl font-semibold mb-6">Nuevo Usuario</h1>
+            <h1 class="text-2xl font-semibold mb-6">Editar Usuario</h1>
 
-            <form @submit.prevent="guardar" class="space-y-4">
-
+            <form @submit.prevent="actualizar" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium mb-1">Cédula</label>
                     <input v-model="form.cedula" type="text" inputmode="numeric" maxlength="9" required
@@ -71,45 +69,28 @@ function guardar() {
                     <p v-if="form.errors.email" class="text-red-500 text-xs mt-1">{{ form.errors.email }}</p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Contraseña</label>
-                        <input v-model="form.password" type="password" required
-                            title="Mínimo 8 caracteres, una mayúscula, un número y un carácter especial."
-                            class="w-full border rounded p-2" />
-                        <p v-if="form.errors.password" class="text-red-500 text-xs mt-1">{{ form.errors.password }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Confirmar Contraseña</label>
-                        <input v-model="form.password_confirmation" type="password" required
-                            title="Debe coincidir con la contraseña."
-                            class="w-full border rounded p-2" />
-                        <p v-if="form.errors.password_confirmation" class="text-red-500 text-xs mt-1">{{ form.errors.password_confirmation }}</p>
-                    </div>
-                </div>
-
                 <div>
                     <label class="block text-sm font-medium mb-1">Rol</label>
                     <select v-model="form.rol" required class="w-full border rounded p-2">
                         <option value="">-- Seleccione un rol --</option>
-                        <option v-for="rol in roles" :key="rol" :value="rol">
-                            {{ rol }}
-                        </option>
+                        <option v-for="rol in roles" :key="rol" :value="rol">{{ rol }}</option>
                     </select>
                     <p v-if="form.errors.rol" class="text-red-500 text-xs mt-1">{{ form.errors.rol }}</p>
                 </div>
 
+                <div class="flex items-center gap-2">
+                    <input id="esta_activo" v-model="form.esta_activo" type="checkbox" />
+                    <label for="esta_activo" class="text-sm">Usuario activo</label>
+                </div>
+
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" :disabled="form.processing"
-                        class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
-                        Guardar
+                    <button type="submit" :disabled="form.processing" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                        Guardar cambios
                     </button>
-                    <a href="/usuarios"
-                        class="border px-6 py-2 rounded hover:bg-gray-50">
+                    <a href="/usuarios" class="border px-6 py-2 rounded hover:bg-gray-50">
                         Cancelar
                     </a>
                 </div>
-
             </form>
         </div>
     </AppLayout>

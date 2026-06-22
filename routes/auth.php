@@ -36,7 +36,7 @@ Route::middleware('guest')->group(function () {
         ->name('password.store');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'active.user'])->group(function () {
     Route::get('force-password-change', function () {
         return Inertia::render('Auth/ForcePasswordChange');
     })->name('password.force.edit');

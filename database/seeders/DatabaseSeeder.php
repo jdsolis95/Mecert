@@ -3,40 +3,54 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // --- 1. Crear los 4 roles del sistema ---
         $roles = ['Administrador', 'Controller', 'Colaborador', 'Comercial'];
 
-        foreach ($roles as $nombre_rol) {
-            Role::firstOrCreate(['name' => $nombre_rol]);
+        foreach ($roles as $roleName) {
+            Role::firstOrCreate(['name' => $roleName]);
         }
 
-        // --- 2. Crear usuario administrador inicial ---
-        $admin = User::updateOrCreate(
-            ['cedula' => env('ADMIN_CEDULA', '000000000')],
-            [
-                'name'              => 'Administrator',
-                'primer_apellido'   => 'Admin',
-                'segundo_apellido'  => 'Admin',
-                'email'             => env('ADMIN_EMAIL', 'Administrator@datacr.com'),
-                'password'          => env('ADMIN_PASSWORD', 'Administrator'),
-                'esta_activo'       => true,
-                'must_change_password' => true,
-            ]
-        );
+        $adminEmail = Str::lower(env('ADMIN_EMAIL', 'administrator@datacr.com'));
+        $adminCedula = env('ADMIN_CEDULA', '000000000');
 
-        // --- 3. Asignar rol Administrador al usuario creado ---
+        $admin = User::where('email', $adminEmail)
+            ->orWhere('cedula', $adminCedula)
+            ->first();
+
+        if (! $admin) {
+            $adminPassword = env('ADMIN_PASSWORD') ?: Str::password(20, letters: true, numbers: true, symbols: true, spaces: false);
+
+            $admin = User::create([
+                'cedula' => $adminCedula,
+                'name' => 'Administrator',
+                'primer_apellido' => 'Admin',
+                'segundo_apellido' => 'Admin',
+                'email' => $adminEmail,
+                'password' => $adminPassword,
+                'esta_activo' => true,
+                'must_change_password' => true,
+            ]);
+
+            if (! env('ADMIN_PASSWORD') && $this->command) {
+                $this->command->warn('Password temporal del administrador inicial:');
+                $this->command->line($adminPassword);
+            }
+        }
+
+        $admin->forceFill([
+            'email' => $adminEmail,
+            'esta_activo' => true,
+        ])->save();
+
         $admin->syncRoles(['Administrador']);
 
-        // Asegurar que los usuarios creados/actualizados por el seeder requieran cambio de contraseña
-        \App\Models\User::where('email', env('ADMIN_EMAIL', 'Administrator@datacr.com'))
-            ->update(['must_change_password' => true]);
+        // Para resetear acceso usa: php artisan admin:ensure --reset-password
     }
 }

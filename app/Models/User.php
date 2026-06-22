@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
@@ -51,5 +53,47 @@ class User extends Authenticatable
             'must_change_password' => 'boolean',
             'esta_activo' => 'boolean',
         ];
+    }
+
+    public function passwordHistories(): HasMany
+    {
+        return $this->hasMany(PasswordHistory::class);
+    }
+
+    public function passwordMatchesCurrentOrRecent(string $plainPassword, int $recentHistoryCount = 2): bool
+    {
+        if (Hash::check($plainPassword, $this->password)) {
+            return true;
+        }
+
+        $recentHistory = $this->passwordHistories()
+            ->latest('id')
+            ->limit($recentHistoryCount)
+            ->pluck('password');
+
+        foreach ($recentHistory as $historicalPassword) {
+            if (Hash::check($plainPassword, $historicalPassword)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function archiveCurrentPassword(): void
+    {
+        $this->passwordHistories()->create([
+            'password' => $this->password,
+        ]);
+
+        $allIds = $this->passwordHistories()
+            ->latest('id')
+            ->pluck('id');
+
+        $idsToDelete = $allIds->slice(2);
+
+        if ($idsToDelete->isNotEmpty()) {
+            $this->passwordHistories()->whereIn('id', $idsToDelete)->delete();
+        }
     }
 }

@@ -1,8 +1,9 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 
+const page = usePage();
 
 // Props que vienen desde el controlador creado para usuarios *****
 const props = defineProps({
@@ -13,6 +14,16 @@ const props = defineProps({
 function deshabilitar(id) {
     if (confirm('¿Desea deshabilitar este usuario?')) {
         router.delete(`/usuarios/${id}`);
+    }
+}
+
+function resetPassword(usuario) {
+    if (confirm(`¿Enviar reset de contraseña a ${usuario.email}?`)) {
+        router.post(`/usuarios/${usuario.id}/reset-password`, {}, {
+            onSuccess: () => {
+                alert('Correo de reset enviado correctamente');
+            }
+        });
     }
 }
 
@@ -58,6 +69,12 @@ function deshabilitar(id) {
                         <td class="p-3 text-sm flex gap-2">
                             <Link :href="`/usuarios/${usuario.id}/edit`"
                                 class="text-blue-600 hover:underline">Editar</Link>
+                            <button
+                                v-if="page.props.auth?.user?.id !== usuario.id"
+                                @click="resetPassword(usuario)"
+                                class="text-yellow-600 hover:underline">
+                                Reset Password
+                            </button>
                             <button @click="deshabilitar(usuario.id)"
                                 class="text-red-600 hover:underline">Deshabilitar</button>
                         </td>

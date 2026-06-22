@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
@@ -37,7 +37,7 @@ class NewPasswordController extends Controller
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'confirmed', Rules\Password::min(8)->mixedCase()->numbers()->symbols()],
         ]);
 
         // Here we will attempt to reset the user's password. If it is successful we
@@ -45,11 +45,22 @@ class NewPasswordController extends Controller
         // database. Otherwise we will parse the error and return the response.
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user) use ($request) {
-                $user->forceFill([
-                    'password' => Hash::make($request->password),
-                    'remember_token' => Str::random(60),
-                ])->save();
+            function ($user, string $password) {
+                if ($user->passwordMatchesCurrentOrRecent($password)) {
+                    throw ValidationException::withMessages([
+                        'password' => 'La contraseña no puede ser igual a la actual ni a las últimas 2 contraseñas.',
+                    ]);
+                }
+
+                DB::transaction(function () use ($user, $password): void {
+                    $user->archiveCurrentPassword();
+
+                    $user->forceFill([
+                        'password' => $password,
+                        'must_change_password' => false,
+                        'remember_token' => Str::random(60),
+                    ])->save();
+                });
 
                 event(new PasswordReset($user));
             }

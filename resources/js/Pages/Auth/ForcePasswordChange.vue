@@ -26,10 +26,10 @@ const submit = () => {
 
         <div class="mb-6">
             <h1 class="text-lg font-semibold text-gray-900">
-                Debes cambiar tu contraseña para continuar
+                Debes cambiar tu contraseña para continuar.
             </h1>
             <p class="mt-2 text-sm text-gray-600">
-                Este acceso requiere una contraseña nueva antes de entrar al sistema.
+                Se requiere una contraseña nueva!
             </p>
         </div>
 
@@ -42,6 +42,7 @@ const submit = () => {
                     class="mt-1 block w-full"
                     v-model="form.current_password"
                     required
+                    title="Ingresa tu contraseña actual."
                     autofocus
                     autocomplete="current-password"
                 />
@@ -56,6 +57,7 @@ const submit = () => {
                     class="mt-1 block w-full"
                     v-model="form.password"
                     required
+                    title="Mínimo 8 caracteres, una mayúscula, un número y un carácter especial."
                     autocomplete="new-password"
                 />
                 <InputError class="mt-2" :message="form.errors.password" />
@@ -69,6 +71,7 @@ const submit = () => {
                     class="mt-1 block w-full"
                     v-model="form.password_confirmation"
                     required
+                    title="Debe coincidir con la contraseña nueva."
                     autocomplete="new-password"
                 />
                 <InputError class="mt-2" :message="form.errors.password_confirmation" />

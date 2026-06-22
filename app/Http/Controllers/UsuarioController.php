@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PasswordReset;
 
 class UsuarioController extends Controller
 {
@@ -44,15 +49,7 @@ class UsuarioController extends Controller
     // Almacena el nuevo usuario en la base de datos
     public function store(Request $request)
     {
-        $request->validate([
-            'cedula'           => 'required|unique:users|max:20',
-            'name'             => 'required|max:100',
-            'primer_apellido'  => 'required|max:100',
-            'segundo_apellido' => 'nullable|max:100',
-            'email'            => 'required|email|unique:users',
-            'password'         => 'required|min:8|confirmed', // confirmed busca password_confirmation
-            'rol'              => 'required|exists:roles,name',
-        ]);
+        $request->validate($this->usuarioRules());
 
         $usuario = User::create([
             'cedula'           => $request->cedula,
@@ -60,7 +57,7 @@ class UsuarioController extends Controller
             'primer_apellido'  => $request->primer_apellido,
             'segundo_apellido' => $request->segundo_apellido,
             'email'            => $request->email,
-            'password'         => bcrypt($request->password),
+            'password'         => $request->password,
             'must_change_password' => true,
             'esta_activo'      => true,
         ]);
@@ -80,6 +77,8 @@ class UsuarioController extends Controller
     // Formulario para editar un usuario existente
     public function edit(User $usuario)
     {
+        abort_if(auth()->id() === $usuario->id, 403, 'No puedes editar tu propio usuario desde esta pantalla.');
+
         $roles = Role::all()->pluck('name');
 
         return Inertia::render('Usuarios/Edit', [
@@ -100,14 +99,7 @@ class UsuarioController extends Controller
     // Actualiza Usuarios Existentes
     public function update(Request $request, User $usuario)
     {
-        $request->validate([
-            'cedula'           => 'required|max:20|unique:users,cedula,' . $usuario->id,
-            'name'             => 'required|max:100',
-            'primer_apellido'  => 'required|max:100',
-            'segundo_apellido' => 'nullable|max:100',
-            'email'            => 'required|email|unique:users,email,' . $usuario->id,
-            'rol'              => 'required|exists:roles,name',
-        ]);
+        $request->validate($this->usuarioRules($usuario));
 
         $usuario->update([
             'cedula'           => $request->cedula,
@@ -127,9 +119,56 @@ class UsuarioController extends Controller
     // Deshabilitar un usuario en lugar de eliminarlo
     public function destroy(User $usuario)
     {
-        $usuario->update(['esta_activo' => false]);
+        abort_if(auth()->id() === $usuario->id, 403, 'No puedes deshabilitar tu propio usuario.');
+
+        $usuario->update(['esta_activo' => ! $usuario->esta_activo]);
 
         return redirect()->route('usuarios.index')
-            ->with('mensaje', 'Usuario deshabilitado.');
+            ->with('mensaje', $usuario->esta_activo ? 'Usuario habilitado.' : 'Usuario deshabilitado.');
+    }
+
+    // Enviar reset de contraseña al usuario
+    public function resetPassword(User $usuario)
+    {
+        abort_if(auth()->id() === $usuario->id, 403, 'No puedes resetear tu propia contraseña desde aquí.');
+
+        $temporaryPassword = Str::random(10);
+
+        $usuario->update([
+            'password' => $temporaryPassword,
+            'must_change_password' => true,
+        ]);
+
+        Mail::to($usuario->email)->send(new PasswordReset($usuario, $temporaryPassword));
+
+        return redirect()->route('usuarios.index')
+            ->with('mensaje', "Contraseña temporal enviada a {$usuario->email}");
+    }
+
+    private function usuarioRules(?User $usuario = null): array
+    {
+        $userId = $usuario?->id;
+
+        return [
+            'cedula' => [
+                'required',
+                'digits:9',
+                Rule::unique('users', 'cedula')->ignore($userId),
+            ],
+            'name' => ['required', 'string', 'max:100', 'regex:/^[^0-9]+$/u'],
+            'primer_apellido' => ['required', 'string', 'max:100', 'regex:/^[^0-9]+$/u'],
+            'segundo_apellido' => ['required', 'string', 'max:100', 'regex:/^[^0-9]+$/u'],
+            'email' => [
+                'required',
+                'email',
+                'regex:/^[A-Za-z0-9._%+-]+@datacr\.com$/i',
+                Rule::unique('users', 'email')->ignore($userId),
+            ],
+            'password' => $usuario
+                ? ['nullable', Password::min(8)->mixedCase()->numbers()->symbols(), 'confirmed']
+                : ['required', Password::min(8)->mixedCase()->numbers()->symbols(), 'confirmed'],
+            'rol' => ['required', Rule::exists('roles', 'name')],
+            'esta_activo' => ['sometimes', 'boolean'],
+        ];
     }
 }
