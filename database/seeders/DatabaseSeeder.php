@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
             Role::firstOrCreate(['name' => $roleName]);
         }
 
+        $this->call(PermisosModuloSeeder::class);
+
         $adminEmail = Str::lower(env('ADMIN_EMAIL', 'administrator@datacr.com'));
         $adminCedula = env('ADMIN_CEDULA', '000000000');
 

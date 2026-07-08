@@ -9,6 +9,7 @@ import {
     Home,
     Info,
     Menu,
+    ShieldCheck,
     Users,
     X,
 } from 'lucide-vue-next';
@@ -17,59 +18,73 @@ const pagina = usePage();
 
 const usuario = computed(() => pagina.props.auth.user);
 const rolActual = computed(() => pagina.props.auth.rol ?? '');
+const permisosActuales = computed(() => pagina.props.auth.permisos ?? []);
 const menuAbierto = ref(false);
 
 defineProps({
     title: String,
 });
 
+// permiso: null = visible para cualquier usuario autenticado (sin control por módulo)
 const itemsMenu = [
     {
         label: 'Dashboard',
         href: '/dashboard',
-        roles: ['Administrador', 'Controller', 'Colaborador', 'Comercial'],
+        permiso: null,
         icono: Home,
     },
     {
         label: 'Usuarios',
         href: '/usuarios',
-        roles: ['Administrador'],
+        soloAdministrador: true,
         icono: Users,
+    },
+    {
+        label: 'Roles',
+        href: '/roles',
+        soloAdministrador: true,
+        icono: ShieldCheck,
     },
     {
         label: 'Certificaciones',
         href: '/certificaciones',
-        roles: ['Administrador', 'Controller', 'Colaborador', 'Comercial'],
+        permiso: 'modulo.certificaciones',
         icono: Award,
     },
     {
         label: 'Mentorias',
         href: '/mentorias',
-        roles: ['Administrador', 'Controller', 'Colaborador'],
+        permiso: 'modulo.mentorias',
         icono: BookOpen,
     },
     {
         label: 'Reportes',
         href: '/reportes',
-        roles: ['Administrador', 'Controller', 'Comercial'],
+        permiso: 'modulo.reportes',
         icono: BarChart3,
     },
     {
         label: 'Acerca de',
         href: '/acerca-de',
-        roles: ['Administrador', 'Controller', 'Colaborador', 'Comercial'],
+        permiso: 'modulo.acerca',
         icono: Info,
     },
     {
         label: 'Ayuda',
         href: '/ayuda',
-        roles: ['Administrador', 'Controller', 'Colaborador', 'Comercial'],
+        permiso: 'modulo.ayuda',
         icono: CircleHelp,
     },
 ];
 
 const menuVisible = computed(() =>
-    itemsMenu.filter((item) => item.roles.includes(rolActual.value)),
+    itemsMenu.filter((item) => {
+        if (item.soloAdministrador) {
+            return rolActual.value === 'Administrador';
+        }
+
+        return !item.permiso || permisosActuales.value.includes(item.permiso);
+    }),
 );
 
 const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${href}/`);

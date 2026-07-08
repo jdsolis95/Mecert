@@ -35,6 +35,8 @@ class HandleInertiaRequests extends Middleware
             'user' => $request->user(),
             // Agrega el rol del usuario autenticado a las props compartidas
             'rol'  => $request->user()?->getRoleNames()->first() ?? '',
+            // Permisos por módulo del usuario, usados para filtrar el menú
+            'permisos' => $request->user()?->getAllPermissions()->pluck('name') ?? [],
                     ],
         ];
     }
