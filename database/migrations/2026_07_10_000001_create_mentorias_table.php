@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('mentorias', function (Blueprint $table) {
             $table->id();
             $table->string('titulo', 150);
-            $table->text('desor_icripcion');
-            $table->foreignId('autd')->constrained('users');
+            $table->text('descripcion');
+            $table->foreignId('autor_id')->constrained('users');
             $table->enum('multimedia_tipo', ['imagen', 'documento', 'video'])->nullable();
             $table->string('multimedia_path')->nullable();
             $table->string('multimedia_nombre_original')->nullable();
