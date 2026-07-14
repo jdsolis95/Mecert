@@ -73,7 +73,7 @@ function resetPassword(usuario) {
                                 v-if="page.props.auth?.user?.id !== usuario.id"
                                 @click="resetPassword(usuario)"
                                 class="text-yellow-600 hover:underline">
-                                Reset Password
+                                Restablecer Contraseña
                             </button>
                             <button @click="deshabilitar(usuario.id)"
                                 class="text-red-600 hover:underline">Deshabilitar</button>

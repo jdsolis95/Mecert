@@ -22,7 +22,7 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        <Head title="Change Password" />
+        <Head title="Cambiar Contraseña" />
 
         <div class="mb-6">
             <h1 class="text-lg font-semibold text-gray-900">
@@ -35,7 +35,7 @@ const submit = () => {
 
         <form @submit.prevent="submit" class="space-y-5">
             <div>
-                <InputLabel for="current_password" value="Current Password" />
+                <InputLabel for="current_password" value="Contraseña Actual" />
                 <TextInput
                     id="current_password"
                     type="password"
@@ -50,7 +50,7 @@ const submit = () => {
             </div>
 
             <div>
-                <InputLabel for="password" value="New Password" />
+                <InputLabel for="password" value="Nueva Contraseña" />
                 <TextInput
                     id="password"
                     type="password"
@@ -64,7 +64,7 @@ const submit = () => {
             </div>
 
             <div>
-                <InputLabel for="password_confirmation" value="Confirm Password" />
+                <InputLabel for="password_confirmation" value="Confirmar Contraseña" />
                 <TextInput
                     id="password_confirmation"
                     type="password"

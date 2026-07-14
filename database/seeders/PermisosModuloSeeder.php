@@ -13,18 +13,18 @@ class PermisosModuloSeeder extends Seeder
     private const PERMISOS_POR_ROL_BASE = [
         'Administrador' => [
             'modulo.certificaciones', 'modulo.mentorias',
-            'modulo.reportes', 'modulo.acerca', 'modulo.ayuda',
+            'modulo.bitacoras', 'modulo.reportes', 'modulo.acerca', 'modulo.ayuda',
         ],
         'Controller' => [
             'modulo.certificaciones', 'modulo.mentorias',
-            'modulo.reportes', 'modulo.acerca', 'modulo.ayuda',
+            'modulo.bitacoras', 'modulo.reportes', 'modulo.acerca', 'modulo.ayuda',
         ],
         'Colaborador' => [
             'modulo.certificaciones', 'modulo.mentorias',
             'modulo.acerca', 'modulo.ayuda',
         ],
         'Comercial' => [
-            'modulo.certificaciones', 'modulo.reportes',
+            'modulo.certificaciones', 'modulo.bitacoras', 'modulo.reportes',
             'modulo.acerca', 'modulo.ayuda',
         ],
     ];

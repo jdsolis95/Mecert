@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AuditoriaController;
+use App\Http\Controllers\MentoriaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UsuarioController;
@@ -31,6 +33,13 @@ Route::middleware(['auth', 'active.user', 'must.change.password'])->group(functi
     Route::resource('roles', RoleController::class)
         ->except('show')
         ->middleware('role:Administrador');
+
+    Route::resource('mentorias', MentoriaController::class)
+        ->middleware('permission:modulo.mentorias');
+
+    Route::get('/bitacoras', [AuditoriaController::class, 'index'])
+        ->middleware('permission:modulo.bitacoras')
+        ->name('bitacoras.index');
 
     Route::get('/acerca-de', fn() => Inertia::render('Acercade'))->name('acerca-de');
 

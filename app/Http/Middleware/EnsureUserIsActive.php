@@ -19,7 +19,7 @@ class EnsureUserIsActive
             $request->session()->regenerateToken();
 
             return redirect()->route('login')
-                ->with('status', 'Cuenta dehabilitada, favor contactar al administrador');
+                ->with('status', 'Cuenta deshabilitada, favor contactar al administrador.');
         }
 
         return $next($request);

@@ -58,7 +58,7 @@ class LoginRequest extends FormRequest
             RateLimiter::clear($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => 'Cuenta dehabilitada, favor contactar al administrador',
+                'email' => 'Cuenta deshabilitada, favor contactar al administrador.',
             ]);
         }
 

@@ -6,6 +6,7 @@ import {
     BarChart3,
     BookOpen,
     CircleHelp,
+    ClipboardList,
     Home,
     Info,
     Menu,
@@ -58,6 +59,12 @@ const itemsMenu = [
         icono: BookOpen,
     },
     {
+        label: 'Bitacoras',
+        href: '/bitacoras',
+        permiso: 'modulo.bitacoras',
+        icono: ClipboardList,
+    },
+    {
         label: 'Reportes',
         href: '/reportes',
         permiso: 'modulo.reportes',
@@ -93,8 +100,8 @@ const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${hre
 <template>
     <div class="min-h-screen bg-gray-100">
         <nav class="border-b border-gray-200 bg-white shadow-sm">
-            <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-                <div class="flex items-center gap-3">
+            <div class="mx-auto flex h-16 max-w-7xl items-center px-4">
+                <div class="flex shrink-0 items-center gap-3">
                     <span class="text-xl font-bold text-blue-700">MeCert</span>
                     <span class="hidden text-sm text-gray-400 sm:block">
                         Datagrama Comunicaciones S.A.
@@ -102,11 +109,13 @@ const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${hre
                 </div>
 
                 <div class="hidden gap-1 md:flex">
+                <div class="hidden min-w-0 flex-1 items-center justify-center gap-0.5 md:flex">
+
                     <Link
                         v-for="item in menuVisible"
                         :key="item.href"
                         :href="item.href"
-                        class="flex items-center gap-1 rounded px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                        class="flex items-center gap-1 whitespace-nowrap rounded px-2 py-2 text-xs text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
                         :class="{
                             'bg-blue-50 font-medium text-blue-700': estaActivo(item.href),
                         }"
@@ -116,7 +125,7 @@ const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${hre
                     </Link>
                 </div>
 
-                <div class="hidden items-center gap-3 md:flex">
+                <div class="hidden shrink-0 items-center gap-3 md:flex">
                     <div class="text-right">
                         <p class="text-sm font-medium text-gray-700">
                             {{ usuario?.name }} {{ usuario?.primer_apellido }}
@@ -142,6 +151,7 @@ const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${hre
                     <Menu v-if="!menuAbierto" class="h-5 w-5" />
                     <X v-else class="h-5 w-5" />
                 </button>
+            </div>
             </div>
 
             <div v-if="menuAbierto" class="border-t border-gray-100 bg-white px-4 py-2 md:hidden">

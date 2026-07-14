@@ -12,17 +12,13 @@ use Inertia\Response;
 
 class ConfirmablePasswordController extends Controller
 {
-    /**
-     * Show the confirm password view.
-     */
+    //confirmación password
     public function show(): Response
     {
         return Inertia::render('Auth/ConfirmPassword');
     }
 
-    /**
-     * Confirm the user's password.
-     */
+    // para confirmar la contraseña
     public function store(Request $request): RedirectResponse
     {
         if (! Auth::guard('web')->validate([
