@@ -103,8 +103,8 @@ const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${hre
             <div class="mx-auto flex h-16 max-w-7xl items-center px-4">
                 <div class="flex shrink-0 items-center gap-3">
                     <span class="text-xl font-bold text-blue-700">MeCert</span>
-                    <span class="hidden text-sm text-gray-400 sm:block">
-                        DATACOM
+                    <span class="hidden text-sm text-black-400 sm:block">
+                        DATACOM   
                     </span>
                 </div>
 
