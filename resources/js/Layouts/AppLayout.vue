@@ -48,7 +48,7 @@ const itemsMenu = [
     },
     {
         label: 'Certificaciones',
-        href: '/certificaciones',
+        href: '/certificados',
         permiso: 'modulo.certificaciones',
         icono: Award,
     },
