@@ -65,6 +65,11 @@ class User extends Authenticatable
         return $this->hasMany(Mentoria::class, 'autor_id');
     }
 
+    public function certificados(): HasMany
+    {
+        return $this->hasMany(Certificado::class, 'colaborador_id');
+    }
+
     public function passwordMatchesCurrentOrRecent(string $plainPassword, int $recentHistoryCount = 2): bool
     {
         if (Hash::check($plainPassword, $this->password)) {

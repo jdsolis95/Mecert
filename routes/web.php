@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\AyudaController;
+use App\Http\Controllers\CertificadoController;
 use App\Http\Controllers\MentoriaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
@@ -37,6 +38,22 @@ Route::middleware(['auth', 'active.user', 'must.change.password'])->group(functi
 
     Route::resource('mentorias', MentoriaController::class)
         ->middleware('permission:modulo.mentorias');
+
+    Route::resource('certificados', CertificadoController::class)
+        ->except('show')
+        ->middleware('permission:modulo.certificaciones');
+
+    Route::post('/certificados/{certificado}/examenes', [CertificadoController::class, 'proponerExamen'])
+        ->middleware('permission:modulo.certificaciones')
+        ->name('certificados.examenes.store');
+
+    Route::get('/certificados-examenes', [CertificadoController::class, 'examenesPendientes'])
+        ->middleware('role:Administrador|Controller')
+        ->name('certificados.examenes.index');
+
+    Route::patch('/certificados-examenes/{examen}', [CertificadoController::class, 'decidirExamen'])
+        ->middleware('role:Administrador|Controller')
+        ->name('certificados.examenes.decidir');
 
     Route::get('/bitacoras', [AuditoriaController::class, 'index'])
         ->middleware('permission:modulo.bitacoras')
