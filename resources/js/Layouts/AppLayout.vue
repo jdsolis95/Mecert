@@ -104,7 +104,7 @@ const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${hre
                 <div class="flex shrink-0 items-center gap-3">
                     <span class="text-xl font-bold text-blue-700">MeCert</span>
                     <span class="hidden text-sm text-gray-400 sm:block">
-                        Datagrama Comunicaciones S.A.
+                        DATACOM
                     </span>
                 </div>
 
@@ -130,7 +130,6 @@ const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${hre
                         <p class="text-sm font-medium text-gray-700">
                             {{ usuario?.name }} {{ usuario?.primer_apellido }}
                         </p>
-                        <p class="text-xs text-gray-400">{{ rolActual }}</p>
                     </div>
                     <Link
                         href="/logout"
@@ -174,7 +173,7 @@ const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${hre
                         <p class="text-sm font-medium text-gray-700">
                             {{ usuario?.name }} {{ usuario?.primer_apellido }}
                         </p>
-                        <p class="text-xs text-gray-400">{{ rolActual }}</p>
+                         */<p class="text-xs text-gray-400">{{ rolActual }}</p>
                     </div>
                     <Link
                         href="/logout"
