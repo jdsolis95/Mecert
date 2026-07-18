@@ -68,11 +68,11 @@ function resetPassword(usuario) {
                         </td>
                         <td class="p-3 text-sm flex gap-2">
                             <Link :href="`/usuarios/${usuario.id}/edit`"
-                                class="text-blue-600 hover:underline">Editar</Link>
+                                class="text-black hover:underline">Editar</Link>
                             <button
                                 v-if="page.props.auth?.user?.id !== usuario.id"
                                 @click="resetPassword(usuario)"
-                                class="text-yellow-600 hover:underline">
+                                class="text-black hover:underline">
                                 Restablecer Contraseña
                             </button>
                             <button @click="deshabilitar(usuario.id)"
