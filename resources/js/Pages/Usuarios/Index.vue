@@ -35,7 +35,7 @@ function resetPassword(usuario) {
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-semibold text-gray-800">Gestión de Usuarios</h1>
                 <Link href="/usuarios/create"
-                    class="bg-brand text-gray-900 px-4 py-2 rounded hover:bg-brand-dark">
+                    class="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark">
                     + Nuevo Usuario
                 </Link>
             </div>

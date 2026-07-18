@@ -84,7 +84,7 @@ function actualizar() {
                 </div>
 
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" :disabled="form.processing" class="bg-brand text-gray-900 px-6 py-2 rounded hover:bg-brand-dark">
+                    <button type="submit" :disabled="form.processing" class="bg-brand text-white px-6 py-2 rounded hover:bg-brand-dark">
                         Guardar cambios
                     </button>
                     <a href="/usuarios" class="border px-6 py-2 rounded hover:bg-gray-50">

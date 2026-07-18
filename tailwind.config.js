@@ -17,10 +17,10 @@ export default {
             },
             colors: {
                 brand: {
-                    DEFAULT: '#61CE70',
-                    dark: '#4CB85C',
-                    darker: '#2E7D32',
-                    light: '#EAFBEC',
+                    DEFAULT: '#1F2937',
+                    dark: '#374151',
+                    darker: '#111827',
+                    light: '#F3F4F6',
                 },
             },
         },

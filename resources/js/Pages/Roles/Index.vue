@@ -27,7 +27,7 @@ function eliminar(rol) {
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-semibold text-gray-800">Administración de Roles</h1>
                 <Link href="/roles/create"
-                    class="bg-brand text-gray-900 px-4 py-2 rounded hover:bg-brand-dark">
+                    class="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark">
                     + Nuevo Rol
                 </Link>
             </div>

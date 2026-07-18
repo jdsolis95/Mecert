@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* @tailwindcss/forms trae el foco/checked en azul fijo; se sobreescribe aqui al verde de marca */
+/* @tailwindcss/forms trae el foco/checked en azul fijo; se sobreescribe aqui al negro de marca */
 [type='text']:focus,
 [type='email']:focus,
 [type='url']:focus,
@@ -18,16 +18,16 @@
 [multiple]:focus,
 textarea:focus,
 select:focus {
-    --tw-ring-color: #61CE70;
-    border-color: #61CE70;
+    --tw-ring-color: #1F2937;
+    border-color: #1F2937;
 }
 
 [type='checkbox'],
 [type='radio'] {
-    color: #61CE70;
+    color: #1F2937;
 }
 
 [type='checkbox']:focus,
 [type='radio']:focus {
-    --tw-ring-color: #61CE70;
+    --tw-ring-color: #1F2937;
 }

@@ -84,7 +84,7 @@ function proponerExamen() {
                         Exámenes pendientes
                     </Link>
                     <Link v-if="puedeCrear" href="/certificados/create"
-                        class="bg-brand text-gray-900 px-4 py-2 rounded hover:bg-brand-dark">
+                        class="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark">
                         + Nuevo certificado
                     </Link>
                 </div>
@@ -169,7 +169,7 @@ function proponerExamen() {
                     </div>
                     <div class="flex gap-3 pt-2">
                         <button type="submit" :disabled="formExamen.processing"
-                            class="bg-brand text-gray-900 px-6 py-2 rounded hover:bg-brand-dark">
+                            class="bg-brand text-white px-6 py-2 rounded hover:bg-brand-dark">
                             Enviar
                         </button>
                         <button type="button" @click="cerrarModalExamen"

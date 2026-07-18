@@ -47,7 +47,7 @@ function alternarDetalle(id) {
                     @click="accion = opcion.valor; filtrar()"
                     type="button"
                     :class="accion === opcion.valor
-                        ? 'bg-brand text-gray-900 border-brand'
+                        ? 'bg-brand text-white border-brand'
                         : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'"
                     class="text-xs px-3 py-1 rounded-full border">
                     {{ opcion.etiqueta }}
@@ -109,7 +109,7 @@ function alternarDetalle(id) {
             <div v-if="auditorias.links.length > 3" class="flex flex-wrap gap-1 mt-6">
                 <template v-for="(link, indice) in auditorias.links" :key="indice">
                     <Link v-if="link.url" :href="link.url" preserve-scroll
-                        :class="link.active ? 'bg-brand text-gray-900 border-brand' : 'bg-white text-gray-600 hover:bg-gray-50'"
+                        :class="link.active ? 'bg-brand text-white border-brand' : 'bg-white text-gray-600 hover:bg-gray-50'"
                         class="text-sm px-3 py-1 rounded border" v-html="link.label" />
                     <span v-else class="text-sm px-3 py-1 rounded border text-gray-300" v-html="link.label" />
                 </template>

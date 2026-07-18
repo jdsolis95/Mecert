@@ -69,7 +69,7 @@ function eliminar() {
 
                     <div v-if="puedeEditar" class="flex gap-3 pt-4 border-t">
                         <Link :href="`/mentorias/${mentoria.id}/edit`"
-                            class="bg-brand text-gray-900 px-4 py-2 rounded hover:bg-brand-dark">
+                            class="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark">
                             Editar
                         </Link>
                         <button @click="eliminar"
