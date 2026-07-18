@@ -98,11 +98,11 @@ const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${hre
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-100">
+    <div class="flex min-h-screen flex-col bg-gray-100">
         <nav class="border-b border-gray-200 bg-white shadow-sm">
             <div class="mx-auto flex h-16 max-w-7xl items-center px-4">
                 <div class="flex shrink-0 items-center gap-3">
-                    <span class="text-xl font-bold text-blue-700">DATACOM</span>
+                    <span class="text-xl font-bold text-black">DATACOM</span>
                     
                 </div>
 
@@ -113,9 +113,9 @@ const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${hre
                         v-for="item in menuVisible"
                         :key="item.href"
                         :href="item.href"
-                        class="flex items-center gap-1 whitespace-nowrap rounded px-2 py-2 text-xs text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+                        class="flex items-center gap-1 whitespace-nowrap rounded px-2 py-2 text-xs text-gray-600 transition-colors hover:bg-gray-100 hover:text-black"
                         :class="{
-                            'bg-blue-50 font-medium text-blue-700': estaActivo(item.href),
+                            'bg-gray-100 font-medium text-black': estaActivo(item.href),
                         }"
                     >
                         <component :is="item.icono" class="h-4 w-4" />
@@ -156,9 +156,9 @@ const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${hre
                     v-for="item in menuVisible"
                     :key="item.href"
                     :href="item.href"
-                    class="flex items-center gap-2 rounded border-b border-gray-50 px-3 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700"
+                    class="flex items-center gap-2 rounded border-b border-gray-50 px-3 py-3 text-sm text-gray-600 hover:bg-gray-100 hover:text-black"
                     :class="{
-                        'bg-blue-50 font-medium text-blue-700': estaActivo(item.href),
+                        'bg-gray-100 font-medium text-black': estaActivo(item.href),
                     }"
                     @click="menuAbierto = false"
                 >
@@ -191,8 +191,16 @@ const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${hre
             </div>
         </header>
 
-        <main class="mx-auto max-w-7xl px-4 py-6">
+        <main class="mx-auto w-full max-w-7xl flex-1 px-4 py-6">
             <slot />
         </main>
+
+        <footer class="border-t border-gray-100 bg-white">
+            <div class="mx-auto max-w-7xl px-4 py-2 text-center text-xs text-gray-500">
+                <p class="font-medium text-gray-700">DATACOM | Datagrama Comunicaciones S.A.</p>
+                <p class="mt-0.5">Service Desk: 800-DATACOM | servicedesk@datacr.com</p>
+                <p class="mt-0.5">Copyright © Datacom 2026 | Política de privacidad | Términos de uso</p>
+            </div>
+        </footer>
     </div>
 </template>
