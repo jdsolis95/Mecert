@@ -12,6 +12,12 @@ class CertificadoPolicy
         return $user->hasAnyRole(['Administrador', 'Controller', 'Colaborador']);
     }
 
+    public function view(User $user, Certificado $certificado): bool
+    {
+        return $user->hasAnyRole(['Administrador', 'Controller', 'Comercial'])
+            || $user->id === $certificado->colaborador_id;
+    }
+
     public function update(User $user, Certificado $certificado): bool
     {
         return $user->hasAnyRole(['Administrador', 'Controller'])

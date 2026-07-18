@@ -83,6 +83,52 @@ class CertificadoController extends Controller
         return redirect()->route('certificados.index')->with('mensaje', 'Certificado creado correctamente.');
     }
 
+    public function show(Request $request, Certificado $certificado)
+    {
+        Gate::authorize('view', $certificado);
+
+        $certificado->load([
+            'colaborador:id,name,primer_apellido,segundo_apellido',
+            'historiales.editadoPor:id,name,primer_apellido',
+            'examenes.propuestoPor:id,name,primer_apellido',
+            'examenes.decididoPor:id,name,primer_apellido',
+        ]);
+
+        $user = $request->user();
+
+        return Inertia::render('Certificados/Show', [
+            'certificado' => [
+                'id' => $certificado->id,
+                'colaborador' => trim($certificado->colaborador->name . ' ' . $certificado->colaborador->primer_apellido),
+                'tipo_certificado' => $certificado->tipo_certificado,
+                'fecha_emision' => $certificado->fecha_emision->format('d/m/Y'),
+                'fecha_vencimiento' => $certificado->fecha_vencimiento->format('d/m/Y'),
+                'estado' => $certificado->estado(),
+                'dias_restantes' => $certificado->diasRestantes(),
+                'documento_nombre_original' => $certificado->documento_nombre_original,
+                'documento_url' => $certificado->documento_path ? Storage::url($certificado->documento_path) : null,
+            ],
+            'historiales' => $certificado->historiales->map(fn (\App\Models\CertificadoHistorial $historial) => [
+                'id' => $historial->id,
+                'editado_por' => trim($historial->editadoPor->name . ' ' . $historial->editadoPor->primer_apellido),
+                'datos_anteriores' => $historial->datos_anteriores,
+                'fecha' => $historial->created_at->format('d/m/Y H:i'),
+            ]),
+            'examenes' => $certificado->examenes->map(fn (CertificadoExamen $examen) => [
+                'id' => $examen->id,
+                'estado' => $examen->estado,
+                'fecha_propuesta' => $examen->fecha_propuesta->format('d/m/Y'),
+                'lugar_propuesto' => $examen->lugar_propuesto,
+                'propuesto_por' => trim($examen->propuestoPor->name . ' ' . $examen->propuestoPor->primer_apellido),
+                'fecha_aprobada' => $examen->fecha_aprobada?->format('d/m/Y'),
+                'lugar_aprobado' => $examen->lugar_aprobado,
+                'comentario' => $examen->comentario,
+                'decidido_por' => $examen->decididoPor ? trim($examen->decididoPor->name . ' ' . $examen->decididoPor->primer_apellido) : null,
+            ]),
+            'puedeEditar' => $user->can('update', $certificado),
+        ]);
+    }
+
     public function edit(Request $request, Certificado $certificado)
     {
         Gate::authorize('update', $certificado);
@@ -276,6 +322,7 @@ class CertificadoController extends Controller
             'estado' => $certificado->estado(),
             'dias_restantes' => $certificado->diasRestantes(),
             'documento_url' => $certificado->documento_path ? Storage::url($certificado->documento_path) : null,
+            'puede_ver' => $user->can('view', $certificado),
             'puede_editar' => $user->can('update', $certificado),
             'puede_eliminar' => $user->can('delete', $certificado),
             'puede_proponer_examen' => $user->can('proponerExamen', $certificado),

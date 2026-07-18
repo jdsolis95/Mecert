@@ -40,7 +40,6 @@ Route::middleware(['auth', 'active.user', 'must.change.password'])->group(functi
         ->middleware('permission:modulo.mentorias');
 
     Route::resource('certificados', CertificadoController::class)
-        ->except('show')
         ->middleware('permission:modulo.certificaciones');
 
     Route::post('/certificados/{certificado}/examenes', [CertificadoController::class, 'proponerExamen'])

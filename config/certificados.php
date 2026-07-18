@@ -1,9 +1,9 @@
 <?php
 
 return [
-    // Meses de antelación para pasar a amarillo antes del vencimiento.
+    // Validación para el vencimiento de un certificado
     'meses_alerta' => env('CERTIFICADOS_MESES_ALERTA', 3),
 
-    // Días de gracia después del vencimiento antes de eliminar el certificado automáticamente.
+    // postarior al vencimiento, se definen días de gracias para el certificado antes de ser eliminado
     'dias_gracia_eliminacion' => env('CERTIFICADOS_DIAS_GRACIA_ELIMINACION', 30),
 ];

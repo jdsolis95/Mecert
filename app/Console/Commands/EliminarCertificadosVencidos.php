@@ -11,7 +11,7 @@ class EliminarCertificadosVencidos extends Command
 {
     protected $signature = 'certificados:eliminar-vencidos';
 
-    protected $description = 'Elimina (soft-delete) los certificados vencidos hace más de los días de gracia configurados';
+    protected $description = 'Elimina (soft-delete) los certificados vencidos hace más de los días de gracia definidos';
 
     public function handle(): void
     {
