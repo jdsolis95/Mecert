@@ -1,6 +1,6 @@
 <?php
 
-// Catálogo permisos asignables ***
+// Catálogo permisos asignables por modulos***
 return [
     'permisos' => [
         'modulo.certificaciones' => 'Certificaciones',

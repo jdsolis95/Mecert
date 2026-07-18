@@ -13,7 +13,7 @@ use Inertia\Response;
 
 class AuthenticatedSessionController extends Controller
 {
-    //desplegar la vista del login//
+    //desplegar la vista del login
     public function create(): Response
     {
         return Inertia::render('Auth/Login', [

@@ -133,12 +133,12 @@ function proponerExamen() {
                         <td class="p-3 text-sm">
                             <div class="flex gap-2 flex-wrap">
                                 <Link v-if="certificado.puede_ver" :href="`/certificados/${certificado.id}`"
-                                    class="text-gray-600 hover:underline">Ver</Link>
+                                    class="text-black hover:underline">Ver</Link>
                                 <Link v-if="certificado.puede_editar" :href="`/certificados/${certificado.id}/edit`"
-                                    class="text-blue-600 hover:underline">Editar</Link>
+                                    class="text-black hover:underline">Editar</Link>
                                 <button v-if="certificado.puede_proponer_examen"
                                     @click="abrirModalExamen(certificado)"
-                                    class="text-purple-600 hover:underline">Calendarizar examen</button>
+                                    class="text-black hover:underline">Calendarizar examen</button>
                                 <button v-if="certificado.puede_eliminar" @click="eliminar(certificado.id)"
                                     class="text-red-600 hover:underline">Eliminar</button>
                             </div>
