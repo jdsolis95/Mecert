@@ -11,9 +11,10 @@ const props = defineProps({
 });
 
 
-function deshabilitar(id) {
-    if (confirm('¿Desea deshabilitar este usuario?')) {
-        router.delete(`/usuarios/${id}`);
+function alternarEstado(usuario) {
+    const accion = usuario.esta_activo ? 'deshabilitar' : 'habilitar';
+    if (confirm(`¿Desea ${accion} este usuario?`)) {
+        router.delete(`/usuarios/${usuario.id}`);
     }
 }
 
@@ -75,8 +76,11 @@ function resetPassword(usuario) {
                                 class="text-black hover:underline">
                                 Restablecer Contraseña
                             </button>
-                            <button @click="deshabilitar(usuario.id)"
-                                class="text-red-600 hover:underline">Deshabilitar</button>
+                            <button @click="alternarEstado(usuario)"
+                                :class="usuario.esta_activo ? 'text-red-600' : 'text-black'"
+                                class="hover:underline">
+                                {{ usuario.esta_activo ? 'Deshabilitar' : 'Habilitar' }}
+                            </button>
                         </td>
                     </tr>
                 </tbody>
