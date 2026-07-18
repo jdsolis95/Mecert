@@ -54,7 +54,7 @@ function eliminar(rol) {
                             <span v-if="rol.modulos.length === 0" class="text-gray-400">Sin módulos</span>
                             <span v-else class="flex flex-wrap gap-1">
                                 <span v-for="modulo in rol.modulos" :key="modulo"
-                                    class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-xs">
+                                    class="bg-gray-100 text-black px-2 py-0.5 rounded text-xs">
                                     {{ modulo }}
                                 </span>
                             </span>
@@ -62,7 +62,7 @@ function eliminar(rol) {
                         <td class="p-3 text-sm">{{ rol.cantidad_usuarios }}</td>
                         <td class="p-3 text-sm flex gap-2">
                             <Link :href="`/roles/${rol.id}/edit`"
-                                class="text-blue-600 hover:underline">Editar</Link>
+                                class="text-black hover:underline">Editar</Link>
                             <button
                                 v-if="!rol.es_rol_base && rol.cantidad_usuarios === 0"
                                 @click="eliminar(rol)"

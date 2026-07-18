@@ -91,7 +91,7 @@ function alternarEtiqueta(id) {
 
                         <div v-if="mentoria.etiquetas.length" class="flex flex-wrap gap-1 mb-3">
                             <span v-for="etiqueta in mentoria.etiquetas" :key="etiqueta.id"
-                                class="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
+                                class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-black">
                                 {{ etiqueta.nombre }}
                             </span>
                         </div>
