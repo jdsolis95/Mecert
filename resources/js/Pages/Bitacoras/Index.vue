@@ -20,7 +20,7 @@ const acciones = [
 
 const estiloAccion = {
     creado: 'bg-green-50 text-green-700',
-    modificado: 'bg-blue-50 text-blue-700',
+    modificado: 'bg-yellow-50 text-yellow-700',
     eliminado: 'bg-red-50 text-red-700',
 };
 
@@ -47,7 +47,7 @@ function alternarDetalle(id) {
                     @click="accion = opcion.valor; filtrar()"
                     type="button"
                     :class="accion === opcion.valor
-                        ? 'bg-blue-600 text-white border-blue-600'
+                        ? 'bg-brand text-gray-900 border-brand'
                         : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'"
                     class="text-xs px-3 py-1 rounded-full border">
                     {{ opcion.etiqueta }}
@@ -82,7 +82,7 @@ function alternarDetalle(id) {
                                 <td class="p-3">{{ registro.usuario }}</td>
                                 <td class="p-3 text-right">
                                     <button type="button" @click="alternarDetalle(registro.id)"
-                                        class="text-blue-600 hover:underline text-xs">
+                                        class="text-brand-darker hover:underline text-xs">
                                         {{ expandido === registro.id ? 'Ocultar' : 'Ver detalle' }}
                                     </button>
                                 </td>
@@ -109,7 +109,7 @@ function alternarDetalle(id) {
             <div v-if="auditorias.links.length > 3" class="flex flex-wrap gap-1 mt-6">
                 <template v-for="(link, indice) in auditorias.links" :key="indice">
                     <Link v-if="link.url" :href="link.url" preserve-scroll
-                        :class="link.active ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 hover:bg-gray-50'"
+                        :class="link.active ? 'bg-brand text-gray-900 border-brand' : 'bg-white text-gray-600 hover:bg-gray-50'"
                         class="text-sm px-3 py-1 rounded border" v-html="link.label" />
                     <span v-else class="text-sm px-3 py-1 rounded border text-gray-300" v-html="link.label" />
                 </template>

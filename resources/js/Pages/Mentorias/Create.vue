@@ -84,10 +84,10 @@ function guardar() {
                     </div>
                     <div v-if="form.etiquetas.length" class="flex flex-wrap gap-1 mt-2">
                         <span v-for="(etiqueta, indice) in form.etiquetas" :key="etiqueta"
-                            class="text-xs pl-2 pr-1 py-0.5 rounded-full bg-blue-50 text-blue-700 flex items-center gap-1">
+                            class="text-xs pl-2 pr-1 py-0.5 rounded-full bg-brand-light text-brand-darker flex items-center gap-1">
                             {{ etiqueta }}
                             <button type="button" @click="quitarEtiqueta(indice)"
-                                class="text-blue-400 hover:text-blue-700">×</button>
+                                class="text-brand hover:text-brand-darker">×</button>
                         </span>
                     </div>
                     <p v-if="form.errors.etiquetas" class="text-red-500 text-xs mt-1">{{ form.errors.etiquetas }}</p>
@@ -142,7 +142,7 @@ function guardar() {
 
                 <div class="flex gap-3 pt-4">
                     <button type="submit" :disabled="form.processing"
-                        class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                        class="bg-brand text-gray-900 px-6 py-2 rounded hover:bg-brand-dark">
                         Guardar
                     </button>
                     <a href="/mentorias" class="border px-6 py-2 rounded hover:bg-gray-50">

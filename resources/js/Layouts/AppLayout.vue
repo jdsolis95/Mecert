@@ -113,9 +113,9 @@ const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${hre
                         v-for="item in menuVisible"
                         :key="item.href"
                         :href="item.href"
-                        class="flex items-center gap-1 whitespace-nowrap rounded px-2 py-2 text-xs text-gray-600 transition-colors hover:bg-gray-100 hover:text-black"
+                        class="flex items-center gap-1 whitespace-nowrap rounded px-2 py-2 text-xs text-gray-600 transition-colors hover:bg-brand-light hover:text-brand-darker"
                         :class="{
-                            'bg-gray-100 font-medium text-black': estaActivo(item.href),
+                            'bg-brand-light font-medium text-brand-darker': estaActivo(item.href),
                         }"
                     >
                         <component :is="item.icono" class="h-4 w-4" />
@@ -156,9 +156,9 @@ const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${hre
                     v-for="item in menuVisible"
                     :key="item.href"
                     :href="item.href"
-                    class="flex items-center gap-2 rounded border-b border-gray-50 px-3 py-3 text-sm text-gray-600 hover:bg-gray-100 hover:text-black"
+                    class="flex items-center gap-2 rounded border-b border-gray-50 px-3 py-3 text-sm text-gray-600 hover:bg-brand-light hover:text-brand-darker"
                     :class="{
-                        'bg-gray-100 font-medium text-black': estaActivo(item.href),
+                        'bg-brand-light font-medium text-brand-darker': estaActivo(item.href),
                     }"
                     @click="menuAbierto = false"
                 >

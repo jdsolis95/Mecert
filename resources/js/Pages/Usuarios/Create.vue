@@ -101,7 +101,7 @@ function guardar() {
 
                 <div class="flex gap-3 pt-4">
                     <button type="submit" :disabled="form.processing"
-                        class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                        class="bg-brand text-gray-900 px-6 py-2 rounded hover:bg-brand-dark">
                         Guardar
                     </button>
                     <a href="/usuarios"

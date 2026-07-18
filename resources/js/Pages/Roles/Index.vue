@@ -27,7 +27,7 @@ function eliminar(rol) {
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-semibold text-gray-800">Administración de Roles</h1>
                 <Link href="/roles/create"
-                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    class="bg-brand text-gray-900 px-4 py-2 rounded hover:bg-brand-dark">
                     + Nuevo Rol
                 </Link>
             </div>
@@ -54,7 +54,7 @@ function eliminar(rol) {
                             <span v-if="rol.modulos.length === 0" class="text-gray-400">Sin módulos</span>
                             <span v-else class="flex flex-wrap gap-1">
                                 <span v-for="modulo in rol.modulos" :key="modulo"
-                                    class="bg-gray-100 text-black px-2 py-0.5 rounded text-xs">
+                                    class="bg-brand-light text-brand-darker px-2 py-0.5 rounded text-xs">
                                     {{ modulo }}
                                 </span>
                             </span>

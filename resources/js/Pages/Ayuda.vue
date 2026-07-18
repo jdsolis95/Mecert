@@ -51,7 +51,7 @@ function subirManual() {
                     :href="manualUrl"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="inline-flex items-center justify-center rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                    class="inline-flex items-center justify-center rounded bg-brand px-4 py-2 text-sm font-medium text-gray-900 hover:bg-brand-dark"
                 >
                     Abrir manual
                 </a>
@@ -63,7 +63,7 @@ function subirManual() {
                     <input type="file" accept="application/pdf,.pdf" @change="alSeleccionarArchivo"
                         class="flex-1 border rounded p-2 text-sm" />
                     <button type="submit" :disabled="form.processing || !form.manual"
-                        class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">
+                        class="rounded bg-brand px-4 py-2 text-sm font-medium text-gray-900 hover:bg-brand-dark disabled:opacity-50">
                         Subir PDF
                     </button>
                 </form>

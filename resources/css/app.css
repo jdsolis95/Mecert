@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* @tailwindcss/forms trae el foco/checked en azul fijo; se sobreescribe aqui al verde de marca */
+[type='text']:focus,
+[type='email']:focus,
+[type='url']:focus,
+[type='password']:focus,
+[type='number']:focus,
+[type='date']:focus,
+[type='datetime-local']:focus,
+[type='month']:focus,
+[type='search']:focus,
+[type='tel']:focus,
+[type='time']:focus,
+[type='week']:focus,
+[multiple]:focus,
+textarea:focus,
+select:focus {
+    --tw-ring-color: #61CE70;
+    border-color: #61CE70;
+}
+
+[type='checkbox'],
+[type='radio'] {
+    color: #61CE70;
+}
+
+[type='checkbox']:focus,
+[type='radio']:focus {
+    --tw-ring-color: #61CE70;
+}

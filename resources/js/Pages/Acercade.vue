@@ -7,7 +7,7 @@ import AppLayout from '@/Layouts/AppLayout.vue'
         <div class="max-w-2xl mx-auto bg-white rounded-lg shadow p-8 space-y-6">
 
             <div class="text-center">
-                <h1 class="text-3xl font-bold text-blue-700">MeCert</h1>
+                <h1 class="text-3xl font-bold text-brand-darker">MeCert</h1>
                 <p class="text-gray-500 text-sm mt-1">
                     Sistema de Mentorías y Certificaciones (MeCert)
                 </p>

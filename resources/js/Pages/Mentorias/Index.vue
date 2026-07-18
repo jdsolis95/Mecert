@@ -43,7 +43,7 @@ function alternarEtiqueta(id) {
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-semibold text-gray-800">Mentorías</h1>
                 <Link href="/mentorias/create"
-                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    class="bg-brand text-gray-900 px-4 py-2 rounded hover:bg-brand-dark">
                     + Nueva Mentoría
                 </Link>
             </div>
@@ -59,7 +59,7 @@ function alternarEtiqueta(id) {
                     @click="alternarEtiqueta(etiqueta.id)"
                     type="button"
                     :class="seleccionadas.includes(etiqueta.id)
-                        ? 'bg-blue-600 text-white border-blue-600'
+                        ? 'bg-brand text-gray-900 border-brand'
                         : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'"
                     class="text-xs px-3 py-1 rounded-full border">
                     {{ etiqueta.nombre }}
@@ -104,7 +104,7 @@ function alternarEtiqueta(id) {
             <div v-if="mentorias.links.length > 3" class="flex flex-wrap gap-1 mt-6">
                 <template v-for="(link, indice) in mentorias.links" :key="indice">
                     <Link v-if="link.url" :href="link.url" preserve-scroll
-                        :class="link.active ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 hover:bg-gray-50'"
+                        :class="link.active ? 'bg-brand text-gray-900 border-brand' : 'bg-white text-gray-600 hover:bg-gray-50'"
                         class="text-sm px-3 py-1 rounded border" v-html="link.label" />
                     <span v-else class="text-sm px-3 py-1 rounded border text-gray-300" v-html="link.label" />
                 </template>

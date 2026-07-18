@@ -76,7 +76,7 @@ const estiloEstadoExamen = {
                 <div>
                     <p class="text-sm text-gray-500">Documento adjunto</p>
                     <a v-if="certificado.documento_url" :href="certificado.documento_url" target="_blank"
-                        class="text-blue-600 hover:underline">
+                        class="text-brand-darker hover:underline">
                         {{ certificado.documento_nombre_original }}
                     </a>
                     <p v-else class="text-gray-400">Sin documento adjunto</p>

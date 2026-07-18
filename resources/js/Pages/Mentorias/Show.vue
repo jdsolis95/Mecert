@@ -17,7 +17,7 @@ function eliminar() {
 <template>
     <AppLayout title="Mentoría">
         <div class="p-6 max-w-3xl mx-auto">
-            <Link href="/mentorias" class="text-sm text-blue-600 hover:underline">← Volver al listado</Link>
+            <Link href="/mentorias" class="text-sm text-brand-darker hover:underline">← Volver al listado</Link>
 
             <div class="bg-white border rounded shadow-sm mt-4 overflow-hidden">
                 <img v-if="mentoria.multimedia?.tipo === 'imagen'" :src="mentoria.multimedia.url"
@@ -38,7 +38,7 @@ function eliminar() {
 
                     <div v-if="mentoria.multimedia?.tipo === 'documento'" class="mb-6">
                         <a :href="mentoria.multimedia.url" target="_blank" rel="noopener noreferrer"
-                            class="text-blue-600 hover:underline text-sm">
+                            class="text-brand-darker hover:underline text-sm">
                             📄 Ver documento: {{ mentoria.multimedia.nombre_original }}
                         </a>
                     </div>
@@ -50,7 +50,7 @@ function eliminar() {
                     </div>
                     <div v-else-if="mentoria.multimedia?.tipo === 'video'" class="mb-6">
                         <a :href="mentoria.multimedia.url" target="_blank" rel="noopener noreferrer"
-                            class="text-blue-600 hover:underline text-sm">
+                            class="text-brand-darker hover:underline text-sm">
                             ▶ Ver video
                         </a>
                     </div>
@@ -60,7 +60,7 @@ function eliminar() {
                         <ul class="space-y-1">
                             <li v-for="(enlace, indice) in mentoria.enlaces" :key="indice">
                                 <a :href="enlace.url" target="_blank" rel="noopener noreferrer"
-                                    class="text-blue-600 hover:underline text-sm">
+                                    class="text-brand-darker hover:underline text-sm">
                                     {{ enlace.texto || enlace.url }}
                                 </a>
                             </li>
@@ -69,7 +69,7 @@ function eliminar() {
 
                     <div v-if="puedeEditar" class="flex gap-3 pt-4 border-t">
                         <Link :href="`/mentorias/${mentoria.id}/edit`"
-                            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                            class="bg-brand text-gray-900 px-4 py-2 rounded hover:bg-brand-dark">
                             Editar
                         </Link>
                         <button @click="eliminar"
