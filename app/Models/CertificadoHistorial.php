@@ -10,6 +10,8 @@ class CertificadoHistorial extends Model
 {
     use HasFactory;
 
+    protected $table = 'certificado_historiales';
+
     protected $fillable = [
         'certificado_id',
         'editado_por_id',

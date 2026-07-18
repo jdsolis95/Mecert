@@ -10,6 +10,8 @@ class CertificadoExamen extends Model
 {
     use HasFactory;
 
+    protected $table = 'certificado_examenes';
+
     protected $fillable = [
         'certificado_id',
         'fecha_propuesta',
