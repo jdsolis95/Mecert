@@ -85,7 +85,7 @@ function guardar() {
                     </div>
                     <div v-if="form.etiquetas.length" class="flex flex-wrap gap-1 mt-2">
                         <span v-for="(etiqueta, indice) in form.etiquetas" :key="etiqueta"
-                            class="text-xs pl-2 pr-1 py-0.5 rounded-full bg-brand-light text-brand-darker flex items-center gap-1">
+                            class="text-xs pl-2 pr-1 py-0.5 rounded-full bg-brand-light text-brand-darker flex items-center gap-1 capitalize">
                             {{ etiqueta }}
                             <button type="button" @click="quitarEtiqueta(indice)"
                                 class="text-brand hover:text-brand-darker">×</button>
@@ -109,13 +109,15 @@ function guardar() {
                         (deja el campo vacío para conservarlo)
                     </p>
 
-                    <div v-if="form.multimedia_tipo === 'imagen'" class="mt-2">
+                    <div v-if="form.multimedia_tipo === 'imagen'" class="mt-2 space-y-2">
                         <input type="file" accept="image/png,image/jpeg,image/webp" @change="alSeleccionarArchivo"
                             class="w-full border rounded p-2" />
+                        <p class="text-xs text-gray-500">Tamaño máximo: 5MB. Formatos aceptados: JPG, PNG o WEBP.</p>
                     </div>
-                    <div v-else-if="form.multimedia_tipo === 'documento'" class="mt-2">
+                    <div v-else-if="form.multimedia_tipo === 'documento'" class="mt-2 space-y-2">
                         <input type="file" accept=".pdf" @change="alSeleccionarArchivo"
                             class="w-full border rounded p-2" />
+                        <p class="text-xs text-gray-500">Tamaño máximo: 5MB. Formato aceptado: PDF.</p>
                     </div>
                     <div v-else-if="form.multimedia_tipo === 'video'" class="mt-2 space-y-2">
                         <input type="file" accept="video/mp4,.mp4" @change="alSeleccionarArchivo"

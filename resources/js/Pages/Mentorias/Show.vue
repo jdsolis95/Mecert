@@ -29,7 +29,7 @@ function eliminar() {
 
                     <div v-if="mentoria.etiquetas.length" class="flex flex-wrap gap-1 mb-4">
                         <span v-for="etiqueta in mentoria.etiquetas" :key="etiqueta.id"
-                            class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-black">
+                            class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-black capitalize">
                             {{ etiqueta.nombre }}
                         </span>
                     </div>

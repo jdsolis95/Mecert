@@ -12,6 +12,8 @@ class RoleController extends Controller
     // Lista todos los roles con su cantidad de usuarios y módulos habilitados
     public function index()
     {
+        $ordenModulos = array_keys(config('modulos.permisos'));
+
         $roles = Role::withCount('users')
             ->with('permissions')
             ->orderBy('name')
@@ -22,6 +24,8 @@ class RoleController extends Controller
                 'es_rol_base' => in_array($role->name, config('modulos.roles_base'), true),
                 'cantidad_usuarios' => $role->users_count,
                 'modulos' => $role->permissions->pluck('name')
+                    ->sortBy(fn ($permiso) => array_search($permiso, $ordenModulos))
+                    ->values()
                     ->map(fn ($permiso) => config("modulos.permisos.$permiso", $permiso))
                     ->values(),
             ]);

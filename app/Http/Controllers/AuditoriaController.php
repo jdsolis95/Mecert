@@ -3,20 +3,37 @@
 namespace App\Http\Controllers;
 
 use App\Models\Auditoria;
+use App\Models\Certificado;
+use App\Models\Mentoria;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AuditoriaController extends Controller
 {
+    // Solo Mentoria y Certificado registran auditoria por ahora (via el trait Auditable).
+    private const MODULOS = [
+        'Mentoria' => Mentoria::class,
+        'Certificado' => Certificado::class,
+    ];
+
     public function index(Request $request)
     {
         $accion = $request->input('accion');
+        $modulo = $request->input('modulo');
+        $usuarioId = $request->input('usuario_id');
+        $desde = $request->input('desde');
+        $hasta = $request->input('hasta');
 
         $auditorias = Auditoria::query()
             ->with('usuario:id,name,primer_apellido')
             ->when($accion, fn ($query) => $query->where('accion', $accion))
+            ->when($modulo && isset(self::MODULOS[$modulo]), fn ($query) => $query->where('auditable_type', self::MODULOS[$modulo]))
+            ->when($usuarioId, fn ($query) => $query->where('usuario_id', $usuarioId))
+            ->when($desde, fn ($query) => $query->whereDate('created_at', '>=', $desde))
+            ->when($hasta, fn ($query) => $query->whereDate('created_at', '<=', $hasta))
             ->latest()
-            ->paginate(20)
+            ->paginate(50)
             ->withQueryString()
             ->through(fn (Auditoria $auditoria) => [
                 'id' => $auditoria->id,
@@ -34,7 +51,18 @@ class AuditoriaController extends Controller
             'auditorias' => $auditorias,
             'filtros' => [
                 'accion' => $accion ?? '',
+                'modulo' => $modulo ?? '',
+                'usuario_id' => $usuarioId ?? '',
+                'desde' => $desde ?? '',
+                'hasta' => $hasta ?? '',
             ],
+            'modulos' => array_keys(self::MODULOS),
+            'usuarios' => User::orderBy('primer_apellido')
+                ->get(['id', 'name', 'primer_apellido'])
+                ->map(fn (User $usuario) => [
+                    'id' => $usuario->id,
+                    'nombre' => trim($usuario->name . ' ' . $usuario->primer_apellido),
+                ]),
         ]);
     }
 

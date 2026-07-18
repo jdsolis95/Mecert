@@ -69,10 +69,22 @@ class UsuarioController extends Controller
     }
 
 
- // public function show(string $id)
- // {
-//  }
-     
+    // Vista de solo lectura de un usuario
+    public function show(User $usuario)
+    {
+        return Inertia::render('Usuarios/Show', [
+            'usuario' => [
+                'id'               => $usuario->id,
+                'cedula'           => $usuario->cedula,
+                'nombre_completo'  => trim($usuario->name . ' ' . $usuario->primer_apellido . ' ' . $usuario->segundo_apellido),
+                'email'            => $usuario->email,
+                'rol'              => $usuario->getRoleNames()->first() ?? 'Sin rol',
+                'esta_activo'      => $usuario->esta_activo,
+            ],
+            'esPropio' => auth()->id() === $usuario->id,
+        ]);
+    }
+
 
     // Formulario para editar un usuario existente
     public function edit(User $usuario)

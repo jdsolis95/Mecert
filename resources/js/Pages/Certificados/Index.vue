@@ -2,13 +2,15 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Modal from '@/Components/Modal.vue';
 import { Link, router, useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { Eye, Pencil, CalendarPlus, Trash2, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-vue-next';
 
 const props = defineProps({
     certificados: Array,
     filtros: Object,
     puedeCrear: Boolean,
     puedeAprobarExamenes: Boolean,
+    examenesPendientesCount: Number,
 });
 
 const q = ref(props.filtros.q ?? '');
@@ -46,6 +48,52 @@ function eliminar(id) {
     }
 }
 
+const ordenColumna = ref(null);
+const ordenAscendente = ref(true);
+const rangoEstado = { rojo: 0, amarillo: 1, verde: 2 };
+
+function ordenarPor(columna) {
+    if (ordenColumna.value === columna) {
+        ordenAscendente.value = !ordenAscendente.value;
+    } else {
+        ordenColumna.value = columna;
+        ordenAscendente.value = true;
+    }
+}
+
+function fechaAOrden(fecha) {
+    const [dia, mes, anio] = fecha.split('/');
+    return Number(anio) * 10000 + Number(mes) * 100 + Number(dia);
+}
+
+const certificadosOrdenados = computed(() => {
+    if (!ordenColumna.value) {
+        return props.certificados;
+    }
+
+    const factor = ordenAscendente.value ? 1 : -1;
+
+    return [...props.certificados].sort((a, b) => {
+        let valorA;
+        let valorB;
+
+        if (ordenColumna.value === 'estado') {
+            valorA = rangoEstado[a.estado];
+            valorB = rangoEstado[b.estado];
+        } else if (ordenColumna.value === 'fecha_emision' || ordenColumna.value === 'fecha_vencimiento') {
+            valorA = fechaAOrden(a[ordenColumna.value]);
+            valorB = fechaAOrden(b[ordenColumna.value]);
+        } else {
+            valorA = a[ordenColumna.value];
+            valorB = b[ordenColumna.value];
+        }
+
+        if (valorA < valorB) return -1 * factor;
+        if (valorA > valorB) return 1 * factor;
+        return 0;
+    });
+});
+
 const mostrarModalExamen = ref(false);
 const certificadoSeleccionado = ref(null);
 
@@ -81,7 +129,7 @@ function proponerExamen() {
                 <div class="flex gap-3">
                     <Link v-if="puedeAprobarExamenes" href="/certificados-examenes"
                         class="border px-4 py-2 rounded hover:bg-gray-50">
-                        Exámenes pendientes
+                        Exámenes pendientes<span v-if="examenesPendientesCount > 0"> ({{ examenesPendientesCount }})</span>
                     </Link>
                     <Link v-if="puedeCrear" href="/certificados/create"
                         class="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark">
@@ -109,38 +157,66 @@ function proponerExamen() {
             <table v-else class="w-full border-collapse bg-white shadow rounded">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th class="p-3 text-left text-sm">Colaborador</th>
+                        <th class="p-3 text-left text-sm">
+                            <button type="button" @click="ordenarPor('colaborador')" class="inline-flex items-center gap-1 hover:text-gray-900">
+                                Colaborador
+                                <component :is="ordenColumna === 'colaborador' ? (ordenAscendente ? ChevronUp : ChevronDown) : ChevronsUpDown" class="h-3.5 w-3.5 text-gray-400" />
+                            </button>
+                        </th>
                         <th class="p-3 text-left text-sm">Tipo de certificado</th>
-                        <th class="p-3 text-left text-sm">Emisión</th>
-                        <th class="p-3 text-left text-sm">Vencimiento</th>
-                        <th class="p-3 text-left text-sm">Estado</th>
+                        <th class="p-3 text-left text-sm">
+                            <button type="button" @click="ordenarPor('fecha_emision')" class="inline-flex items-center gap-1 hover:text-gray-900">
+                                Emisión
+                                <component :is="ordenColumna === 'fecha_emision' ? (ordenAscendente ? ChevronUp : ChevronDown) : ChevronsUpDown" class="h-3.5 w-3.5 text-gray-400" />
+                            </button>
+                        </th>
+                        <th class="p-3 text-left text-sm">
+                            <button type="button" @click="ordenarPor('fecha_vencimiento')" class="inline-flex items-center gap-1 hover:text-gray-900">
+                                Vencimiento
+                                <component :is="ordenColumna === 'fecha_vencimiento' ? (ordenAscendente ? ChevronUp : ChevronDown) : ChevronsUpDown" class="h-3.5 w-3.5 text-gray-400" />
+                            </button>
+                        </th>
+                        <th class="p-3 text-left text-sm">
+                            <button type="button" @click="ordenarPor('estado')" class="inline-flex items-center gap-1 hover:text-gray-900">
+                                Estado
+                                <component :is="ordenColumna === 'estado' ? (ordenAscendente ? ChevronUp : ChevronDown) : ChevronsUpDown" class="h-3.5 w-3.5 text-gray-400" />
+                            </button>
+                        </th>
                         <th class="p-3 text-left text-sm">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="certificado in certificados" :key="certificado.id"
-                        class="border-t hover:bg-gray-50">
+                    <tr v-for="certificado in certificadosOrdenados" :key="certificado.id"
+                        class="border-t even:bg-gray-50 hover:bg-gray-100">
                         <td class="p-3 text-sm">{{ certificado.colaborador }}</td>
                         <td class="p-3 text-sm">{{ certificado.tipo_certificado }}</td>
                         <td class="p-3 text-sm">{{ certificado.fecha_emision }}</td>
                         <td class="p-3 text-sm">{{ certificado.fecha_vencimiento }}</td>
                         <td class="p-3 text-sm">
                             <span :class="estiloEstado[certificado.estado]"
-                                class="px-2 py-1 rounded text-xs font-medium">
+                                class="px-2 py-1 rounded text-xs font-medium inline-block text-center min-w-[88px]">
                                 {{ etiquetaEstado[certificado.estado] }}
                             </span>
                         </td>
                         <td class="p-3 text-sm">
-                            <div class="flex gap-2 flex-wrap">
+                            <div class="flex gap-1">
                                 <Link v-if="certificado.puede_ver" :href="`/certificados/${certificado.id}`"
-                                    class="text-black hover:underline">Ver</Link>
+                                    title="Ver" class="inline-flex items-center justify-center rounded p-1.5 text-gray-600 hover:bg-gray-200">
+                                    <Eye class="h-4 w-4" />
+                                </Link>
                                 <Link v-if="certificado.puede_editar" :href="`/certificados/${certificado.id}/edit`"
-                                    class="text-black hover:underline">Editar</Link>
+                                    title="Editar" class="inline-flex items-center justify-center rounded p-1.5 text-gray-600 hover:bg-gray-200">
+                                    <Pencil class="h-4 w-4" />
+                                </Link>
                                 <button v-if="certificado.puede_proponer_examen"
                                     @click="abrirModalExamen(certificado)"
-                                    class="text-black hover:underline">Calendarizar examen</button>
+                                    title="Calendarizar examen" class="inline-flex items-center justify-center rounded p-1.5 text-gray-600 hover:bg-gray-200">
+                                    <CalendarPlus class="h-4 w-4" />
+                                </button>
                                 <button v-if="certificado.puede_eliminar" @click="eliminar(certificado.id)"
-                                    class="text-red-600 hover:underline">Eliminar</button>
+                                    title="Eliminar" class="inline-flex items-center justify-center rounded p-1.5 text-red-600 hover:bg-red-50">
+                                    <Trash2 class="h-4 w-4" />
+                                </button>
                             </div>
                         </td>
                     </tr>

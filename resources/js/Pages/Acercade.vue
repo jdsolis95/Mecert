@@ -48,6 +48,19 @@ import AppLayout from '@/Layouts/AppLayout.vue'
                 ejecutivos de negocio consultar esta información durante procesos de licitación.
             </p>
 
+            <hr class="border-gray-100" />
+
+            <!-- Notas de version -->
+            <div class="text-sm text-gray-600">
+                <h2 class="font-medium text-gray-700 mb-2">Notas de la versión</h2>
+                <p class="font-medium text-gray-500 text-xs mb-1">1.0.0</p>
+                <ul class="list-disc list-inside space-y-1 text-xs">
+                    <li>Rediseño visual: paleta unificada, tablas con filas alternadas y acciones en iconos.</li>
+                    <li>Filtros y ordenamiento en Certificados, Bitácoras y Usuarios.</li>
+                    <li>Vista de detalle de solo lectura en Usuarios.</li>
+                </ul>
+            </div>
+
         </div>
     </AppLayout>
 </template>

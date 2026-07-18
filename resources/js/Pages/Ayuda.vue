@@ -63,7 +63,7 @@ function subirManual() {
                     <input type="file" accept="application/pdf,.pdf" @change="alSeleccionarArchivo"
                         class="flex-1 border rounded p-2 text-sm" />
                     <button type="submit" :disabled="form.processing || !form.manual"
-                        class="rounded bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-50">
+                        class="rounded bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark disabled:bg-gray-300 disabled:text-gray-500 disabled:hover:bg-gray-300 disabled:cursor-not-allowed">
                         Subir PDF
                     </button>
                 </form>
@@ -71,7 +71,7 @@ function subirManual() {
                 <p class="text-xs text-gray-400 mt-1">Solo PDF, máximo 20MB. Reemplaza el manual actual.</p>
             </div>
 
-            <div v-if="manualExiste" class="overflow-hidden rounded border border-gray-200 bg-white shadow-sm">
+            <div v-if="manualExiste" class="mx-auto max-w-4xl overflow-hidden rounded border border-gray-200 bg-white shadow-sm">
                 <iframe
                     :src="manualUrl"
                     title="Manual de usuario MeCert"

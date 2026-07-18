@@ -2,6 +2,9 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import { Image as ImageIcon, FileText, Video } from 'lucide-vue-next';
+
+const iconoPorTipo = { imagen: ImageIcon, documento: FileText, video: Video };
 
 const props = defineProps({
     mentorias: Object,
@@ -61,7 +64,7 @@ function alternarEtiqueta(id) {
                     :class="seleccionadas.includes(etiqueta.id)
                         ? 'bg-brand text-white border-brand'
                         : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'"
-                    class="text-xs px-3 py-1 rounded-full border">
+                    class="text-xs px-3 py-1 rounded-full border capitalize">
                     {{ etiqueta.nombre }}
                 </button>
             </div>
@@ -74,15 +77,21 @@ function alternarEtiqueta(id) {
                 <Link v-for="mentoria in mentorias.data" :key="mentoria.id"
                     :href="`/mentorias/${mentoria.id}`"
                     class="block bg-white border rounded shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-                    <img v-if="mentoria.multimedia?.tipo === 'imagen'" :src="mentoria.multimedia.url"
-                        class="w-full h-40 object-cover" />
-                    <div v-else-if="mentoria.multimedia?.tipo === 'documento'"
-                        class="w-full h-40 bg-gray-50 flex items-center justify-center text-gray-400 text-sm">
-                        📄 {{ mentoria.multimedia.nombre_original }}
-                    </div>
-                    <div v-else-if="mentoria.multimedia?.tipo === 'video'"
-                        class="w-full h-40 bg-gray-50 flex items-center justify-center text-gray-400 text-sm">
-                        ▶ {{ mentoria.multimedia.nombre_original || 'Video' }}
+                    <div class="relative">
+                        <img v-if="mentoria.multimedia?.tipo === 'imagen'" :src="mentoria.multimedia.url"
+                            class="w-full h-40 object-cover" />
+                        <div v-else-if="mentoria.multimedia?.tipo === 'documento'"
+                            class="w-full h-40 bg-gray-50 flex items-center justify-center text-gray-400 text-sm">
+                            {{ mentoria.multimedia.nombre_original }}
+                        </div>
+                        <div v-else-if="mentoria.multimedia?.tipo === 'video'"
+                            class="w-full h-40 bg-gray-50 flex items-center justify-center text-gray-400 text-sm">
+                            {{ mentoria.multimedia.nombre_original || 'Video' }}
+                        </div>
+
+                        <span v-if="mentoria.multimedia?.tipo" class="absolute top-2 left-2 inline-flex items-center justify-center rounded-full bg-white/90 p-1.5 shadow">
+                            <component :is="iconoPorTipo[mentoria.multimedia.tipo]" class="h-4 w-4 text-gray-600" />
+                        </span>
                     </div>
 
                     <div class="p-4">
@@ -91,7 +100,7 @@ function alternarEtiqueta(id) {
 
                         <div v-if="mentoria.etiquetas.length" class="flex flex-wrap gap-1 mb-3">
                             <span v-for="etiqueta in mentoria.etiquetas" :key="etiqueta.id"
-                                class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-black">
+                                class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-black capitalize">
                                 {{ etiqueta.nombre }}
                             </span>
                         </div>

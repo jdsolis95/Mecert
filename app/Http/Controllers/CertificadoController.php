@@ -32,6 +32,8 @@ class CertificadoController extends Controller
             ->values()
             ->map(fn (Certificado $certificado) => $this->mapaListado($certificado, $user));
 
+        $puedeAprobarExamenes = $user->hasAnyRole(['Administrador', 'Controller']);
+
         return Inertia::render('Certificados/Index', [
             'certificados' => $certificados,
             'filtros' => [
@@ -39,7 +41,10 @@ class CertificadoController extends Controller
                 'estado' => $request->input('estado', ''),
             ],
             'puedeCrear' => Gate::allows('create', Certificado::class),
-            'puedeAprobarExamenes' => $user->hasAnyRole(['Administrador', 'Controller']),
+            'puedeAprobarExamenes' => $puedeAprobarExamenes,
+            'examenesPendientesCount' => $puedeAprobarExamenes
+                ? CertificadoExamen::where('estado', 'pendiente')->count()
+                : 0,
         ]);
     }
 
