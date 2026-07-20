@@ -4,20 +4,24 @@ import { Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { Image as ImageIcon, FileText, Video, LayoutGrid, Grid3x3, List } from 'lucide-vue-next';
 
+//tipo de icono
 const iconoPorTipo = { imagen: ImageIcon, documento: FileText, video: Video };
 
+//definir props
 const props = defineProps({
     mentorias: Object,
     etiquetasDisponibles: Array,
     filtros: Object,
 });
 
+//defiincion tipo de vistas
 const vistas = [
     { valor: 'grande', etiqueta: 'Cuadrícula grande', icono: LayoutGrid },
-    { valor: 'pequena', etiqueta: 'Iconos pequeños', icono: Grid3x3 },
+    { valor: 'pequena', etiqueta: 'Cuadrícula pequeña', icono: Grid3x3 },
     { valor: 'lista', etiqueta: 'Lista con detalles', icono: List },
 ];
 
+//variable modos de vista
 const modoVista = ref(localStorage.getItem('mentorias_vista') ?? 'grande');
 
 function cambiarVista(valor) {
@@ -42,6 +46,7 @@ function alEscribir() {
     temporizador = setTimeout(buscar, 400);
 }
 
+//aplica cambio de etiqueta
 function alternarEtiqueta(id) {
     const indice = seleccionadas.value.indexOf(id);
     if (indice === -1) {
@@ -60,7 +65,7 @@ function alternarEtiqueta(id) {
                 <h1 class="text-2xl font-semibold text-gray-800">Mentorías</h1>
                 <Link href="/mentorias/create"
                     class="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark">
-                    + Nueva Mentoría
+                    + Agregar Mentoría
                 </Link>
             </div>
 
@@ -81,7 +86,7 @@ function alternarEtiqueta(id) {
                     {{ etiqueta.nombre }}
                 </button>
             </div>
-
+            <!-- OPCIONES DE CAMBIO DE VISTAS EN MODULO MENTORIAS -->
             <div class="flex items-center justify-end gap-1 mb-4">
                 <button v-for="vista in vistas" :key="vista.valor"
                     type="button"
@@ -99,7 +104,7 @@ function alternarEtiqueta(id) {
                 No hay mentorías que coincidan con la búsqueda.
             </div>
 
-            <!-- Vista: cuadrícula grande (tarjetas completas) -->
+            <!-- Vista: iconos grandes -->
             <div v-else-if="modoVista === 'grande'" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Link v-for="mentoria in mentorias.data" :key="mentoria.id"
                     :href="`/mentorias/${mentoria.id}`"
@@ -137,7 +142,7 @@ function alternarEtiqueta(id) {
                 </Link>
             </div>
 
-            <!-- Vista: iconos pequeños (solo miniatura + titulo, mas columnas) -->
+            <!-- Vista: iconos pequeños -->
             <div v-else-if="modoVista === 'pequena'" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 <Link v-for="mentoria in mentorias.data" :key="mentoria.id"
                     :href="`/mentorias/${mentoria.id}`"
@@ -154,7 +159,7 @@ function alternarEtiqueta(id) {
                 </Link>
             </div>
 
-            <!-- Vista: lista con detalles (filas horizontales) -->
+            <!-- Vista: lista con detalles -->
             <div v-else class="space-y-2">
                 <Link v-for="mentoria in mentorias.data" :key="mentoria.id"
                     :href="`/mentorias/${mentoria.id}`"

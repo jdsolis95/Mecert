@@ -1,5 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
+import BitacorasTabs from '@/Components/BitacorasTabs.vue';
 import { Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { Eye, EyeOff } from 'lucide-vue-next';
@@ -53,7 +54,9 @@ function alternarDetalle(id) {
 <template>
     <AppLayout title="Bitácoras">
         <div class="p-6">
-            <h1 class="text-2xl font-semibold text-gray-800 mb-6">Bitácoras de auditoría</h1>
+            <h1 class="text-2xl font-semibold text-gray-800 mb-6">Bitácoras</h1>
+
+            <BitacorasTabs activa="movimientos" />
 
             <div class="flex flex-wrap gap-2 mb-4">
                 <button v-for="opcion in acciones" :key="opcion.valor"

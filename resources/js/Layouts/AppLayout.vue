@@ -94,7 +94,13 @@ const menuVisible = computed(() =>
     }),
 );
 
-const estaActivo = (href) => pagina.url === href || pagina.url.startsWith(`${href}/`);
+const estaActivo = (href) => {
+    if (href === '/bitacoras' && pagina.url.startsWith('/bitacora-accesos')) {
+        return true;
+    }
+
+    return pagina.url === href || pagina.url.startsWith(`${href}/`);
+};
 </script>
 
 <template>

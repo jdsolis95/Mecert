@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccesoController;
 use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\AyudaController;
 use App\Http\Controllers\CertificadoController;
@@ -57,6 +58,10 @@ Route::middleware(['auth', 'active.user', 'must.change.password'])->group(functi
     Route::get('/bitacoras', [AuditoriaController::class, 'index'])
         ->middleware('permission:modulo.bitacoras')
         ->name('bitacoras.index');
+
+    Route::get('/bitacora-accesos', [AccesoController::class, 'index'])
+        ->middleware('permission:modulo.bitacoras')
+        ->name('bitacora-accesos.index');
 
     Route::get('/acerca-de', fn() => Inertia::render('Acercade'))->name('acerca-de');
 
