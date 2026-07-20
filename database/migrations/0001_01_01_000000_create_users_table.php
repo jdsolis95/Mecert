@@ -10,10 +10,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $tabla) {
-        $tabla->id();                              // id (estándar Laravel, auto_increment)
+        $tabla->id();                              // id (estándar Laravel, auto_incrementa)
         $tabla->string('cedula', 20)->unique();    // cédula física costarricense, única
-        $tabla->string('name', 100);               // nombre
-        $tabla->string('primer_apellido', 100);    // primer apellido
+        $tabla->string('name', 100);               // nombre del colaborador
+        $tabla->string('primer_apellido', 100);    
         $tabla->string('segundo_apellido', 100)->nullable(); // segundo apellido (opcional)
         $tabla ->string('email')->unique();          // correo corporativo
         $tabla->timestamp('email_verified_at')->nullable();

@@ -2,7 +2,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import { Image as ImageIcon, FileText, Video } from 'lucide-vue-next';
+import { Image as ImageIcon, FileText, Video, LayoutGrid, Grid3x3, List } from 'lucide-vue-next';
 
 const iconoPorTipo = { imagen: ImageIcon, documento: FileText, video: Video };
 
@@ -11,6 +11,19 @@ const props = defineProps({
     etiquetasDisponibles: Array,
     filtros: Object,
 });
+
+const vistas = [
+    { valor: 'grande', etiqueta: 'Cuadrícula grande', icono: LayoutGrid },
+    { valor: 'pequena', etiqueta: 'Iconos pequeños', icono: Grid3x3 },
+    { valor: 'lista', etiqueta: 'Lista con detalles', icono: List },
+];
+
+const modoVista = ref(localStorage.getItem('mentorias_vista') ?? 'grande');
+
+function cambiarVista(valor) {
+    modoVista.value = valor;
+    localStorage.setItem('mentorias_vista', valor);
+}
 
 const q = ref(props.filtros.q ?? '');
 const seleccionadas = ref([...(props.filtros.etiquetas ?? [])]);
@@ -69,11 +82,25 @@ function alternarEtiqueta(id) {
                 </button>
             </div>
 
+            <div class="flex items-center justify-end gap-1 mb-4">
+                <button v-for="vista in vistas" :key="vista.valor"
+                    type="button"
+                    @click="cambiarVista(vista.valor)"
+                    :title="vista.etiqueta"
+                    :class="modoVista === vista.valor
+                        ? 'bg-brand text-white border-brand'
+                        : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-100'"
+                    class="inline-flex items-center justify-center rounded p-1.5 border">
+                    <component :is="vista.icono" class="h-4 w-4" />
+                </button>
+            </div>
+
             <div v-if="mentorias.data.length === 0" class="text-center text-gray-400 py-12">
                 No hay mentorías que coincidan con la búsqueda.
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Vista: cuadrícula grande (tarjetas completas) -->
+            <div v-else-if="modoVista === 'grande'" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Link v-for="mentoria in mentorias.data" :key="mentoria.id"
                     :href="`/mentorias/${mentoria.id}`"
                     class="block bg-white border rounded shadow-sm hover:shadow-md transition-shadow overflow-hidden">
@@ -107,6 +134,51 @@ function alternarEtiqueta(id) {
 
                         <p class="text-xs text-gray-400">{{ mentoria.autor }} · {{ mentoria.fecha }}</p>
                     </div>
+                </Link>
+            </div>
+
+            <!-- Vista: iconos pequeños (solo miniatura + titulo, mas columnas) -->
+            <div v-else-if="modoVista === 'pequena'" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <Link v-for="mentoria in mentorias.data" :key="mentoria.id"
+                    :href="`/mentorias/${mentoria.id}`"
+                    class="block bg-white border rounded shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+                    <div class="relative">
+                        <img v-if="mentoria.multimedia?.tipo === 'imagen'" :src="mentoria.multimedia.url"
+                            class="w-full h-20 object-cover" />
+                        <div v-else
+                            class="w-full h-20 bg-gray-50 flex items-center justify-center text-gray-300">
+                            <component :is="mentoria.multimedia?.tipo ? iconoPorTipo[mentoria.multimedia.tipo] : ImageIcon" class="h-6 w-6" />
+                        </div>
+                    </div>
+                    <p class="text-xs font-medium text-gray-700 p-2 truncate">{{ mentoria.titulo }}</p>
+                </Link>
+            </div>
+
+            <!-- Vista: lista con detalles (filas horizontales) -->
+            <div v-else class="space-y-2">
+                <Link v-for="mentoria in mentorias.data" :key="mentoria.id"
+                    :href="`/mentorias/${mentoria.id}`"
+                    class="flex items-center gap-4 bg-white border rounded p-3 hover:bg-gray-50 transition-colors">
+                    <div class="relative shrink-0">
+                        <img v-if="mentoria.multimedia?.tipo === 'imagen'" :src="mentoria.multimedia.url"
+                            class="h-14 w-14 rounded object-cover" />
+                        <div v-else class="h-14 w-14 rounded bg-gray-50 flex items-center justify-center text-gray-300">
+                            <component :is="mentoria.multimedia?.tipo ? iconoPorTipo[mentoria.multimedia.tipo] : ImageIcon" class="h-6 w-6" />
+                        </div>
+                    </div>
+
+                    <div class="min-w-0 flex-1">
+                        <h2 class="font-semibold text-gray-800">{{ mentoria.titulo }}</h2>
+                        <p class="text-sm text-gray-500 truncate">{{ mentoria.descripcion }}</p>
+                        <div v-if="mentoria.etiquetas.length" class="flex flex-wrap gap-1 mt-1">
+                            <span v-for="etiqueta in mentoria.etiquetas" :key="etiqueta.id"
+                                class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-black capitalize">
+                                {{ etiqueta.nombre }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-gray-400 shrink-0 whitespace-nowrap">{{ mentoria.autor }} · {{ mentoria.fecha }}</p>
                 </Link>
             </div>
 
