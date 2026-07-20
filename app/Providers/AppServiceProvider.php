@@ -4,12 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Auth\Events\Login;
-use Illuminate\Auth\Events\Logout;
-use App\Listeners\RegistrarIngreso;
-use App\Listeners\RegistrarSalida;
 use App\Models\User;
 
 class AppServiceProvider extends ServiceProvider
@@ -29,9 +24,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
-        // Bitacora de ingresos y salidas al sistema
-        Event::listen(Login::class, RegistrarIngreso::class);
-        Event::listen(Logout::class, RegistrarSalida::class);
+        // Nota: RegistrarIngreso/RegistrarSalida (app/Listeners) se auto-descubren
+        // por convencion (metodo handle() tipado a Login/Logout) — no requieren
+        // registro manual con Event::listen(), eso causaba doble ejecucion.
 
         // Register a small artisan helper to force the must_change_password flag
         Artisan::command('user:force-change {email?} {--all}', function ($email = null) {
