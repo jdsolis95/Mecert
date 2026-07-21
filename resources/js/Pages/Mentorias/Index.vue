@@ -12,6 +12,7 @@ const props = defineProps({
     mentorias: Object,
     etiquetasDisponibles: Array,
     filtros: Object,
+    puedeAdministrarCatalogos: Boolean,
 });
 
 //defiincion tipo de vistas
@@ -63,10 +64,16 @@ function alternarEtiqueta(id) {
         <div class="p-6">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-semibold text-gray-800">Mentorías</h1>
-                <Link href="/mentorias/create"
-                    class="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark">
-                    + Agregar Mentoría
-                </Link>
+                <div class="flex gap-3">
+                    <Link v-if="puedeAdministrarCatalogos" href="/etiquetas"
+                        class="border px-4 py-2 rounded hover:bg-gray-50">
+                        Etiquetas
+                    </Link>
+                    <Link href="/mentorias/create"
+                        class="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark">
+                        + Agregar Mentoría
+                    </Link>
+                </div>
             </div>
 
             <div class="mb-4">

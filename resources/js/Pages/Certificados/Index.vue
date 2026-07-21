@@ -11,6 +11,7 @@ const props = defineProps({
     puedeCrear: Boolean,
     puedeAprobarExamenes: Boolean,
     examenesPendientesCount: Number,
+    puedeAdministrarCatalogos: Boolean,
 });
 
 const q = ref(props.filtros.q ?? '');
@@ -127,6 +128,10 @@ function proponerExamen() {
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-semibold text-gray-800">Certificados</h1>
                 <div class="flex gap-3">
+                    <Link v-if="puedeAdministrarCatalogos" href="/tipos-certificacion"
+                        class="border px-4 py-2 rounded hover:bg-gray-50">
+                        Tipos de certificación
+                    </Link>
                     <Link v-if="puedeAprobarExamenes" href="/certificados-examenes"
                         class="border px-4 py-2 rounded hover:bg-gray-50">
                         Exámenes pendientes<span v-if="examenesPendientesCount > 0"> ({{ examenesPendientesCount }})</span>

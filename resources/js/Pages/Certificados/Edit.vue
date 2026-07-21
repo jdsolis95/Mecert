@@ -6,11 +6,12 @@ const props = defineProps({
     certificado: Object,
     colaboradores: Array,
     colaboradorFijo: Object,
+    tiposCertificacion: Array,
 });
 
 const form = useForm({
     colaborador_id: props.certificado.colaborador_id,
-    tipo_certificado: props.certificado.tipo_certificado,
+    tipo_certificado_id: props.certificado.tipo_certificado_id,
     fecha_emision: props.certificado.fecha_emision,
     fecha_vencimiento: props.certificado.fecha_vencimiento,
     documento_adjunto: null,
@@ -48,10 +49,13 @@ function guardar() {
 
                 <div>
                     <label class="block text-sm font-medium mb-1">Tipo de certificado</label>
-                    <input v-model="form.tipo_certificado" type="text" required maxlength="150"
-                        class="w-full border rounded p-2" />
-                    <p v-if="form.errors.tipo_certificado" class="text-red-500 text-xs mt-1">
-                        {{ form.errors.tipo_certificado }}
+                    <select v-model="form.tipo_certificado_id" required class="w-full border rounded p-2">
+                        <option v-for="tipo in tiposCertificacion" :key="tipo.id" :value="tipo.id">
+                            {{ tipo.nombre }}{{ !tipo.activo ? ' (inactivo)' : '' }}
+                        </option>
+                    </select>
+                    <p v-if="form.errors.tipo_certificado_id" class="text-red-500 text-xs mt-1">
+                        {{ form.errors.tipo_certificado_id }}
                     </p>
                 </div>
 

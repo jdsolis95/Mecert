@@ -17,7 +17,7 @@ class Certificado extends Model
 
     protected $fillable = [
         'colaborador_id',
-        'tipo_certificado',
+        'tipo_certificado_id',
         'fecha_emision',
         'fecha_vencimiento',
         'documento_path',
@@ -42,6 +42,11 @@ class Certificado extends Model
         return $this->belongsTo(User::class, 'colaborador_id');
     }
 
+    public function tipoCertificacion(): BelongsTo
+    {
+        return $this->belongsTo(TipoCertificacion::class, 'tipo_certificado_id');
+    }
+
     public function eliminadoPor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'eliminado_por_id');
@@ -60,7 +65,7 @@ class Certificado extends Model
     public function scopeBuscar(Builder $query, string $texto): Builder
     {
         return $query->where(function (Builder $q) use ($texto) {
-            $q->where('tipo_certificado', 'like', "%{$texto}%")
+            $q->whereHas('tipoCertificacion', fn (Builder $tq) => $tq->where('nombre', 'like', "%{$texto}%"))
                 ->orWhereHas('colaborador', function (Builder $cq) use ($texto) {
                     $cq->where('name', 'like', "%{$texto}%")
                         ->orWhere('primer_apellido', 'like', "%{$texto}%")
@@ -98,7 +103,8 @@ class Certificado extends Model
     {
         return [
             'colaborador_id' => $this->colaborador_id,
-            'tipo_certificado' => $this->tipo_certificado,
+            // find() fresco por id (no la relacion cacheada) para que "antes" y "despues" no arrastren un valor viejo
+            'tipo_certificado' => TipoCertificacion::find($this->tipo_certificado_id)?->nombre,
             'fecha_emision' => $this->fecha_emision?->toDateString(),
             'fecha_vencimiento' => $this->fecha_vencimiento?->toDateString(),
             'documento_path' => $this->documento_path,
@@ -112,7 +118,7 @@ class Certificado extends Model
         $this->historiales()->create([
             'editado_por_id' => $editadoPorId,
             'datos_anteriores' => [
-                'tipo_certificado' => $this->getOriginal('tipo_certificado'),
+                'tipo_certificado' => TipoCertificacion::find($this->getOriginal('tipo_certificado_id'))?->nombre,
                 'fecha_emision' => $this->getOriginal('fecha_emision'),
                 'fecha_vencimiento' => $this->getOriginal('fecha_vencimiento'),
                 'documento_path' => $this->getOriginal('documento_path'),

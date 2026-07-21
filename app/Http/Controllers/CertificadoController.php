@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\CertificadoPorVencer;
 use App\Models\Certificado;
 use App\Models\CertificadoExamen;
+use App\Models\TipoCertificacion;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ class CertificadoController extends Controller
         $soloPropios = $user->hasRole('Colaborador') && ! $user->hasAnyRole(['Administrador', 'Controller']);
 
         $certificados = Certificado::query()
-            ->with('colaborador:id,name,primer_apellido,segundo_apellido')
+            ->with(['colaborador:id,name,primer_apellido,segundo_apellido', 'tipoCertificacion:id,nombre'])
             ->when($soloPropios, fn ($query) => $query->paraColaborador($user->id))
             ->when($request->filled('q'), fn ($query) => $query->buscar($request->string('q')->toString()))
             ->latest()
@@ -45,6 +46,7 @@ class CertificadoController extends Controller
             'examenesPendientesCount' => $puedeAprobarExamenes
                 ? CertificadoExamen::where('estado', 'pendiente')->count()
                 : 0,
+            'puedeAdministrarCatalogos' => $user->hasRole('Administrador'),
         ]);
     }
 
@@ -61,6 +63,7 @@ class CertificadoController extends Controller
                 'id' => $user->id,
                 'nombre' => trim($user->name . ' ' . $user->primer_apellido),
             ],
+            'tiposCertificacion' => TipoCertificacion::activos()->orderBy('nombre')->get(['id', 'nombre']),
         ]);
     }
 
@@ -76,7 +79,7 @@ class CertificadoController extends Controller
         DB::transaction(function () use ($request, $colaboradorId) {
             $certificado = Certificado::create([
                 'colaborador_id' => $colaboradorId,
-                'tipo_certificado' => $request->tipo_certificado,
+                'tipo_certificado_id' => $request->tipo_certificado_id,
                 'fecha_emision' => $request->fecha_emision,
                 'fecha_vencimiento' => $request->fecha_vencimiento,
                 ...$this->resolverDocumento($request),
@@ -94,6 +97,7 @@ class CertificadoController extends Controller
 
         $certificado->load([
             'colaborador:id,name,primer_apellido,segundo_apellido',
+            'tipoCertificacion:id,nombre',
             'historiales.editadoPor:id,name,primer_apellido',
             'examenes.propuestoPor:id,name,primer_apellido',
             'examenes.decididoPor:id,name,primer_apellido',
@@ -105,7 +109,7 @@ class CertificadoController extends Controller
             'certificado' => [
                 'id' => $certificado->id,
                 'colaborador' => trim($certificado->colaborador->name . ' ' . $certificado->colaborador->primer_apellido),
-                'tipo_certificado' => $certificado->tipo_certificado,
+                'tipo_certificado' => $certificado->tipoCertificacion->nombre,
                 'fecha_emision' => $certificado->fecha_emision->format('d/m/Y'),
                 'fecha_vencimiento' => $certificado->fecha_vencimiento->format('d/m/Y'),
                 'estado' => $certificado->estado(),
@@ -147,7 +151,7 @@ class CertificadoController extends Controller
             'certificado' => [
                 'id' => $certificado->id,
                 'colaborador_id' => $certificado->colaborador_id,
-                'tipo_certificado' => $certificado->tipo_certificado,
+                'tipo_certificado_id' => $certificado->tipo_certificado_id,
                 'fecha_emision' => $certificado->fecha_emision->toDateString(),
                 'fecha_vencimiento' => $certificado->fecha_vencimiento->toDateString(),
                 'documento_nombre_original' => $certificado->documento_nombre_original,
@@ -158,6 +162,11 @@ class CertificadoController extends Controller
                 'id' => $certificado->colaborador->id,
                 'nombre' => trim($certificado->colaborador->name . ' ' . $certificado->colaborador->primer_apellido),
             ],
+            // Tipos activos + el tipo actual aunque haya sido deshabilitado despues, para no perderlo del select
+            'tiposCertificacion' => TipoCertificacion::activos()
+                ->orWhere('id', $certificado->tipo_certificado_id)
+                ->orderBy('nombre')
+                ->get(['id', 'nombre', 'activo']),
         ]);
     }
 
@@ -179,7 +188,7 @@ class CertificadoController extends Controller
 
             $certificado->update([
                 'colaborador_id' => $colaboradorId,
-                'tipo_certificado' => $request->tipo_certificado,
+                'tipo_certificado_id' => $request->tipo_certificado_id,
                 'fecha_emision' => $request->fecha_emision,
                 'fecha_vencimiento' => $request->fecha_vencimiento,
                 // Si cambió la fecha de vencimiento, se reabre la ventana de avisos.
@@ -231,7 +240,7 @@ class CertificadoController extends Controller
         Gate::authorize('aprobarExamen', Certificado::class);
 
         $examenes = CertificadoExamen::query()
-            ->with(['certificado.colaborador:id,name,primer_apellido,segundo_apellido', 'propuestoPor:id,name,primer_apellido'])
+            ->with(['certificado.colaborador:id,name,primer_apellido,segundo_apellido', 'certificado.tipoCertificacion:id,nombre', 'propuestoPor:id,name,primer_apellido'])
             ->where('estado', 'pendiente')
             ->latest()
             ->get()
@@ -239,7 +248,7 @@ class CertificadoController extends Controller
                 'id' => $examen->id,
                 'certificado' => [
                     'id' => $examen->certificado->id,
-                    'tipo_certificado' => $examen->certificado->tipo_certificado,
+                    'tipo_certificado' => $examen->certificado->tipoCertificacion->nombre,
                     'colaborador' => trim($examen->certificado->colaborador->name . ' ' . $examen->certificado->colaborador->primer_apellido),
                 ],
                 'fecha_propuesta' => $examen->fecha_propuesta->format('d/m/Y'),
@@ -321,7 +330,7 @@ class CertificadoController extends Controller
         return [
             'id' => $certificado->id,
             'colaborador' => trim($certificado->colaborador->name . ' ' . $certificado->colaborador->primer_apellido),
-            'tipo_certificado' => $certificado->tipo_certificado,
+            'tipo_certificado' => $certificado->tipoCertificacion->nombre,
             'fecha_emision' => $certificado->fecha_emision->format('d/m/Y'),
             'fecha_vencimiento' => $certificado->fecha_vencimiento->format('d/m/Y'),
             'estado' => $certificado->estado(),
@@ -338,9 +347,9 @@ class CertificadoController extends Controller
     {
         return [
             'colaborador_id' => ['required', 'exists:users,id'],
-            'tipo_certificado' => [
-                'required', 'string', 'max:150',
-                Rule::unique('certificados')
+            'tipo_certificado_id' => [
+                'required', 'exists:tipos_certificacion,id',
+                Rule::unique('certificados', 'tipo_certificado_id')
                     ->where(fn ($query) => $query->where('colaborador_id', $colaboradorId)->whereNull('deleted_at'))
                     ->ignore($certificado?->id),
             ],

@@ -5,11 +5,12 @@ import { useForm } from '@inertiajs/vue3';
 const props = defineProps({
     colaboradores: Array,
     colaboradorFijo: Object,
+    tiposCertificacion: Array,
 });
 
 const form = useForm({
     colaborador_id: props.colaboradorFijo?.id ?? '',
-    tipo_certificado: '',
+    tipo_certificado_id: '',
     fecha_emision: '',
     fecha_vencimiento: '',
     documento_adjunto: null,
@@ -48,11 +49,17 @@ function guardar() {
 
                 <div>
                     <label class="block text-sm font-medium mb-1">Tipo de certificado</label>
-                    <input v-model="form.tipo_certificado" type="text" required maxlength="150"
-                        placeholder="Ej. Cisco CCNA, Avaya ACSS..."
-                        class="w-full border rounded p-2" />
-                    <p v-if="form.errors.tipo_certificado" class="text-red-500 text-xs mt-1">
-                        {{ form.errors.tipo_certificado }}
+                    <select v-model="form.tipo_certificado_id" required class="w-full border rounded p-2">
+                        <option value="">Seleccione un tipo de certificado</option>
+                        <option v-for="tipo in tiposCertificacion" :key="tipo.id" :value="tipo.id">
+                            {{ tipo.nombre }}
+                        </option>
+                    </select>
+                    <p v-if="tiposCertificacion.length === 0" class="text-xs text-gray-400 mt-1">
+                        No hay tipos activos. Pídele a un Administrador que agregue uno en el mantenimiento de Tipos de Certificación.
+                    </p>
+                    <p v-if="form.errors.tipo_certificado_id" class="text-red-500 text-xs mt-1">
+                        {{ form.errors.tipo_certificado_id }}
                     </p>
                 </div>
 

@@ -20,7 +20,7 @@ class NotificarCertificadosPorVencer extends Command
 
         $enviados = 0;
 
-        Certificado::with('colaborador')->chunk(100, function ($certificados) use ($controllers, &$enviados) {
+        Certificado::with(['colaborador', 'tipoCertificacion'])->chunk(100, function ($certificados) use ($controllers, &$enviados) {
             foreach ($certificados as $certificado) {
                 $estado = $certificado->estado();
 

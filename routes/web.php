@@ -4,9 +4,11 @@ use App\Http\Controllers\AccesoController;
 use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\AyudaController;
 use App\Http\Controllers\CertificadoController;
+use App\Http\Controllers\EtiquetaController;
 use App\Http\Controllers\MentoriaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TipoCertificacionController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -40,8 +42,25 @@ Route::middleware(['auth', 'active.user', 'session.idle', 'must.change.password'
     Route::resource('mentorias', MentoriaController::class)
         ->middleware('permission:modulo.mentorias');
 
+    Route::resource('etiquetas', EtiquetaController::class)
+        ->except('show')
+        ->middleware('role:Administrador');
+
+    Route::patch('/etiquetas/{etiqueta}/alternar', [EtiquetaController::class, 'alternar'])
+        ->middleware('role:Administrador')
+        ->name('etiquetas.alternar');
+
     Route::resource('certificados', CertificadoController::class)
         ->middleware('permission:modulo.certificaciones');
+
+    Route::resource('tipos-certificacion', TipoCertificacionController::class)
+        ->except('show')
+        ->parameters(['tipos-certificacion' => 'tipo_certificacion'])
+        ->middleware('role:Administrador');
+
+    Route::patch('/tipos-certificacion/{tipo_certificacion}/alternar', [TipoCertificacionController::class, 'alternar'])
+        ->middleware('role:Administrador')
+        ->name('tipos-certificacion.alternar');
 
     Route::post('/certificados/{certificado}/examenes', [CertificadoController::class, 'proponerExamen'])
         ->middleware('permission:modulo.certificaciones')

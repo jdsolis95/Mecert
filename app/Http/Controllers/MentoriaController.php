@@ -37,13 +37,14 @@ class MentoriaController extends Controller
                 'q' => $request->input('q', ''),
                 'etiquetas' => $etiquetaIds,
             ],
+            'puedeAdministrarCatalogos' => $request->user()->hasRole('Administrador'),
         ]);
     }
 
     public function create()
     {
         return Inertia::render('Mentorias/Create', [
-            'etiquetasDisponibles' => Etiqueta::orderBy('nombre')->pluck('nombre'),
+            'etiquetasDisponibles' => Etiqueta::activas()->orderBy('nombre')->get(['id', 'nombre']),
         ]);
     }
 
@@ -59,7 +60,7 @@ class MentoriaController extends Controller
                 ...$this->resolverMultimedia($request),
             ]);
 
-            $mentoria->etiquetas()->sync(Etiqueta::idsParaNombres($request->input('etiquetas', [])));
+            $mentoria->etiquetas()->sync($request->input('etiquetas', []));
 
             $this->sincronizarEnlaces($mentoria, $request->input('enlaces', []));
 
@@ -99,14 +100,18 @@ class MentoriaController extends Controller
                 'id' => $mentoria->id,
                 'titulo' => $mentoria->titulo,
                 'descripcion' => $mentoria->descripcion,
-                'etiquetas' => $mentoria->etiquetas->pluck('nombre')->all(),
+                'etiquetas' => $mentoria->etiquetas->pluck('id')->all(),
                 'enlaces' => $mentoria->enlaces->map(fn ($e) => ['url' => $e->url, 'texto' => $e->texto])->all(),
                 'multimedia_tipo' => $mentoria->multimedia_tipo,
                 'multimedia_url' => $mentoria->multimedia_url,
                 'multimedia_nombre_original' => $mentoria->multimedia_nombre_original,
                 'multimedia_preview_url' => $mentoria->multimedia_path ? Storage::url($mentoria->multimedia_path) : null,
             ],
-            'etiquetasDisponibles' => Etiqueta::orderBy('nombre')->pluck('nombre'),
+            // Etiquetas activas + las ya asignadas a esta mentoria aunque hayan sido deshabilitadas despues
+            'etiquetasDisponibles' => Etiqueta::activas()
+                ->orWhereHas('mentorias', fn ($q) => $q->where('mentorias.id', $mentoria->id))
+                ->orderBy('nombre')
+                ->get(['id', 'nombre', 'activo']),
         ]);
     }
 
@@ -127,7 +132,7 @@ class MentoriaController extends Controller
                 ...$this->resolverMultimedia($request, $mentoria),
             ]);
 
-            $mentoria->etiquetas()->sync(Etiqueta::idsParaNombres($request->input('etiquetas', [])));
+            $mentoria->etiquetas()->sync($request->input('etiquetas', []));
 
             $mentoria->enlaces()->delete();
             $this->sincronizarEnlaces($mentoria, $request->input('enlaces', []));
@@ -255,7 +260,15 @@ class MentoriaController extends Controller
             'descripcion' => ['required', 'string'],
 
             'etiquetas' => ['required', 'array', 'min:1'],
-            'etiquetas.*' => ['required', 'string', 'max:50'],
+            // Valida activa, o ya asignada a esta mentoria (permite conservarla aunque se haya deshabilitado despues)
+            'etiquetas.*' => ['required', 'integer', function ($attribute, $value, $fail) use ($mentoria) {
+                $activa = Etiqueta::where('id', $value)->where('activo', true)->exists();
+                $yaAsignada = $mentoria && $mentoria->etiquetas()->where('etiquetas.id', $value)->exists();
+
+                if (! $activa && ! $yaAsignada) {
+                    $fail('La etiqueta seleccionada no está disponible.');
+                }
+            }],
 
             'multimedia_tipo' => ['nullable', Rule::in(['imagen', 'documento', 'video'])],
 

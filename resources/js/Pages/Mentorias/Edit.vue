@@ -1,7 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
 
 const props = defineProps({
     mentoria: Object,
@@ -16,20 +15,6 @@ const form = useForm({
     multimedia_archivo: null,
     enlaces: props.mentoria.enlaces.map((enlace) => ({ ...enlace })),
 });
-
-const nuevaEtiqueta = ref('');
-
-function agregarEtiqueta() {
-    const valor = nuevaEtiqueta.value.trim();
-    if (valor && !form.etiquetas.includes(valor)) {
-        form.etiquetas.push(valor);
-    }
-    nuevaEtiqueta.value = '';
-}
-
-function quitarEtiqueta(indice) {
-    form.etiquetas.splice(indice, 1);
-}
 
 function alSeleccionarArchivo(evento) {
     form.multimedia_archivo = evento.target.files[0] ?? null;
@@ -70,27 +55,17 @@ function guardar() {
 
                 <div>
                     <label class="block text-sm font-medium mb-1">Etiquetas</label>
-                    <div class="flex gap-2">
-                        <input v-model="nuevaEtiqueta" type="text" list="etiquetas-list"
-                            @keydown.enter.prevent="agregarEtiqueta"
-                            placeholder="Ej. Avaya, Ruckus, Cisco..."
-                            class="flex-1 border rounded p-2" />
-                        <datalist id="etiquetas-list">
-                            <option v-for="etiqueta in etiquetasDisponibles" :key="etiqueta" :value="etiqueta" />
-                        </datalist>
-                        <button type="button" @click="agregarEtiqueta"
-                            class="border px-4 rounded hover:bg-gray-50">
-                            Agregar
-                        </button>
+                    <div v-if="etiquetasDisponibles.length" class="grid grid-cols-2 gap-2 border rounded p-3">
+                        <label v-for="etiqueta in etiquetasDisponibles" :key="etiqueta.id"
+                            class="flex items-center gap-2 text-sm capitalize">
+                            <input type="checkbox" :value="etiqueta.id" v-model="form.etiquetas" />
+                            {{ etiqueta.nombre }}
+                            <span v-if="!etiqueta.activo" class="text-xs text-gray-400">(inactiva)</span>
+                        </label>
                     </div>
-                    <div v-if="form.etiquetas.length" class="flex flex-wrap gap-1 mt-2">
-                        <span v-for="(etiqueta, indice) in form.etiquetas" :key="etiqueta"
-                            class="text-xs pl-2 pr-1 py-0.5 rounded-full bg-brand-light text-brand-darker flex items-center gap-1 capitalize">
-                            {{ etiqueta }}
-                            <button type="button" @click="quitarEtiqueta(indice)"
-                                class="text-brand hover:text-brand-darker">×</button>
-                        </span>
-                    </div>
+                    <p v-else class="text-xs text-gray-400">
+                        No hay etiquetas activas. Pídele a un Administrador que agregue una en el mantenimiento de Etiquetas.
+                    </p>
                     <p v-if="form.errors.etiquetas" class="text-red-500 text-xs mt-1">{{ form.errors.etiquetas }}</p>
                 </div>
 
