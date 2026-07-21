@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'must.change.password' => \App\Http\Middleware\EnsurePasswordIsChanged::class,
             'active.user' => \App\Http\Middleware\EnsureUserIsActive::class,
+            'session.idle' => \App\Http\Middleware\EnsureSessionIsNotIdle::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

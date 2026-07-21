@@ -3,6 +3,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import BitacorasTabs from '@/Components/BitacorasTabs.vue';
 import { Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-vue-next';
 
 const props = defineProps({
     accesos: Object,
@@ -19,6 +20,24 @@ function filtrar() {
         usuario_id: usuarioId.value,
         desde: desde.value,
         hasta: hasta.value,
+        orden: props.filtros.orden,
+        direccion: props.filtros.direccion,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    });
+}
+
+function ordenarPor(columna) {
+    const direccion = (props.filtros.orden === columna && props.filtros.direccion === 'asc') ? 'desc' : 'asc';
+
+    router.get('/bitacora-accesos', {
+        usuario_id: usuarioId.value,
+        desde: desde.value,
+        hasta: hasta.value,
+        orden: columna,
+        direccion,
     }, {
         preserveState: true,
         preserveScroll: true,
@@ -61,9 +80,24 @@ function filtrar() {
                     <thead class="bg-gray-50 text-gray-500 text-left">
                         <tr>
                             <th class="p-3 font-medium">Código_ingreso</th>
-                            <th class="p-3 font-medium">Usuario</th>
-                            <th class="p-3 font-medium">Fecha y hora de ingreso</th>
-                            <th class="p-3 font-medium">Fecha y hora de salida</th>
+                            <th class="p-3 font-medium">
+                                <button type="button" @click="ordenarPor('usuario')" class="inline-flex items-center gap-1 hover:text-gray-900">
+                                    Usuario
+                                    <component :is="filtros.orden === 'usuario' ? (filtros.direccion === 'asc' ? ChevronUp : ChevronDown) : ChevronsUpDown" class="h-3.5 w-3.5" />
+                                </button>
+                            </th>
+                            <th class="p-3 font-medium">
+                                <button type="button" @click="ordenarPor('fecha_ingreso')" class="inline-flex items-center gap-1 hover:text-gray-900">
+                                    Fecha y hora de ingreso
+                                    <component :is="filtros.orden === 'fecha_ingreso' ? (filtros.direccion === 'asc' ? ChevronUp : ChevronDown) : ChevronsUpDown" class="h-3.5 w-3.5" />
+                                </button>
+                            </th>
+                            <th class="p-3 font-medium">
+                                <button type="button" @click="ordenarPor('fecha_salida')" class="inline-flex items-center gap-1 hover:text-gray-900">
+                                    Fecha y hora de salida
+                                    <component :is="filtros.orden === 'fecha_salida' ? (filtros.direccion === 'asc' ? ChevronUp : ChevronDown) : ChevronsUpDown" class="h-3.5 w-3.5" />
+                                </button>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>

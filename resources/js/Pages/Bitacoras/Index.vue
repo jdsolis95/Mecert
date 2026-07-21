@@ -3,7 +3,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import BitacorasTabs from '@/Components/BitacorasTabs.vue';
 import { Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import { Eye, EyeOff } from 'lucide-vue-next';
+import { Eye, EyeOff, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-vue-next';
 
 const props = defineProps({
     auditorias: Object,
@@ -39,6 +39,26 @@ function filtrar() {
         usuario_id: usuarioId.value,
         desde: desde.value,
         hasta: hasta.value,
+        orden: props.filtros.orden,
+        direccion: props.filtros.direccion,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    });
+}
+
+function ordenarPor(columna) {
+    const direccion = (props.filtros.orden === columna && props.filtros.direccion === 'asc') ? 'desc' : 'asc';
+
+    router.get('/bitacoras', {
+        accion: accion.value,
+        modulo: modulo.value,
+        usuario_id: usuarioId.value,
+        desde: desde.value,
+        hasta: hasta.value,
+        orden: columna,
+        direccion,
     }, {
         preserveState: true,
         preserveScroll: true,
@@ -103,10 +123,30 @@ function alternarDetalle(id) {
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 text-gray-500 text-left">
                         <tr>
-                            <th class="p-3 font-medium">Fecha</th>
-                            <th class="p-3 font-medium">Módulo</th>
-                            <th class="p-3 font-medium">Acción</th>
-                            <th class="p-3 font-medium">Usuario</th>
+                            <th class="p-3 font-medium">
+                                <button type="button" @click="ordenarPor('fecha')" class="inline-flex items-center gap-1 hover:text-gray-900">
+                                    Fecha
+                                    <component :is="filtros.orden === 'fecha' ? (filtros.direccion === 'asc' ? ChevronUp : ChevronDown) : ChevronsUpDown" class="h-3.5 w-3.5" />
+                                </button>
+                            </th>
+                            <th class="p-3 font-medium">
+                                <button type="button" @click="ordenarPor('modulo')" class="inline-flex items-center gap-1 hover:text-gray-900">
+                                    Módulo
+                                    <component :is="filtros.orden === 'modulo' ? (filtros.direccion === 'asc' ? ChevronUp : ChevronDown) : ChevronsUpDown" class="h-3.5 w-3.5" />
+                                </button>
+                            </th>
+                            <th class="p-3 font-medium">
+                                <button type="button" @click="ordenarPor('accion')" class="inline-flex items-center gap-1 hover:text-gray-900">
+                                    Acción
+                                    <component :is="filtros.orden === 'accion' ? (filtros.direccion === 'asc' ? ChevronUp : ChevronDown) : ChevronsUpDown" class="h-3.5 w-3.5" />
+                                </button>
+                            </th>
+                            <th class="p-3 font-medium">
+                                <button type="button" @click="ordenarPor('usuario')" class="inline-flex items-center gap-1 hover:text-gray-900">
+                                    Usuario
+                                    <component :is="filtros.orden === 'usuario' ? (filtros.direccion === 'asc' ? ChevronUp : ChevronDown) : ChevronsUpDown" class="h-3.5 w-3.5" />
+                                </button>
+                            </th>
                             <th class="p-3 font-medium"></th>
                         </tr>
                     </thead>
