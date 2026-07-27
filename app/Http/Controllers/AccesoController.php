@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Acceso;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -57,6 +59,51 @@ class AccesoController extends Controller
                     'id' => $usuario->id,
                     'nombre' => trim($usuario->name . ' ' . $usuario->primer_apellido),
                 ]),
+            'puedeGenerarReporte' => $request->user()->hasAnyRole(['Administrador', 'Controller']),
         ]);
+    }
+
+    public function reportePdf(Request $request)
+    {
+        $usuarioId = $request->input('usuario_id');
+        $desde = $request->input('desde');
+        $hasta = $request->input('hasta');
+
+        $accesos = Acceso::query()
+            ->with('usuario:id,name,primer_apellido,segundo_apellido,cedula')
+            ->when($usuarioId, fn ($q) => $q->where('usuario_id', $usuarioId))
+            ->when($desde, fn ($q) => $q->whereDate('fecha_ingreso', '>=', $desde))
+            ->when($hasta, fn ($q) => $q->whereDate('fecha_ingreso', '<=', $hasta))
+            ->orderByDesc('fecha_ingreso')
+            ->get();
+
+        $filas = $accesos->map(fn (Acceso $acceso) => [
+            'usuario' => trim($acceso->usuario->name . ' ' . $acceso->usuario->primer_apellido . ' ' . $acceso->usuario->segundo_apellido),
+            'cedula' => $acceso->usuario->cedula,
+            'fecha_ingreso' => $acceso->fecha_ingreso->format('d/m/Y H:i:s'),
+            'fecha_salida' => $acceso->fecha_salida?->format('d/m/Y H:i:s') ?? 'Sesión activa',
+            'ip' => $acceso->ip_ingreso,
+        ]);
+
+        $totales = [
+            'total' => $accesos->count(),
+            'cerradas' => $accesos->whereNotNull('fecha_salida')->count(),
+            'activas' => $accesos->whereNull('fecha_salida')->count(),
+        ];
+
+        $partesFiltro = [];
+        if ($desde) $partesFiltro[] = 'Desde: ' . Carbon::parse($desde)->format('d/m/Y');
+        if ($hasta) $partesFiltro[] = 'Hasta: ' . Carbon::parse($hasta)->format('d/m/Y');
+        if ($usuarioId && $usuario = User::find($usuarioId)) $partesFiltro[] = 'Usuario: ' . trim($usuario->name . ' ' . $usuario->primer_apellido);
+
+        $pdf = Pdf::loadView('reportes.bitacora-accesos', [
+            'titulo' => 'Reporte de Bitácora de Accesos',
+            'filtrosTexto' => $partesFiltro ? implode(' | ', $partesFiltro) : 'Sin filtros aplicados',
+            'generadoPor' => trim($request->user()->name . ' ' . $request->user()->primer_apellido),
+            'filas' => $filas,
+            'totales' => $totales,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->stream('reporte-bitacora-accesos.pdf');
     }
 }

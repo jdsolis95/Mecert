@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Etiqueta;
 use App\Models\Mentoria;
+use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -30,6 +33,8 @@ class MentoriaController extends Controller
             ->withQueryString()
             ->through(fn (Mentoria $mentoria) => $this->mapaListado($mentoria));
 
+        $puedeGenerarReporte = $request->user()->hasAnyRole(['Administrador', 'Controller']);
+
         return Inertia::render('Mentorias/Index', [
             'mentorias' => $mentorias,
             'etiquetasDisponibles' => Etiqueta::orderBy('nombre')->get(['id', 'nombre']),
@@ -38,6 +43,11 @@ class MentoriaController extends Controller
                 'etiquetas' => $etiquetaIds,
             ],
             'puedeAdministrarCatalogos' => $request->user()->hasRole('Administrador'),
+            'puedeGenerarReporte' => $puedeGenerarReporte,
+            'autoresFiltro' => $puedeGenerarReporte
+                ? User::orderBy('primer_apellido')->get(['id', 'name', 'primer_apellido'])
+                    ->map(fn (User $usuario) => ['id' => $usuario->id, 'nombre' => trim($usuario->name . ' ' . $usuario->primer_apellido)])
+                : [],
         ]);
     }
 
@@ -154,6 +164,61 @@ class MentoriaController extends Controller
         $mentoria->delete();
 
         return redirect()->route('mentorias.index')->with('mensaje', 'Publicación eliminada correctamente.');
+    }
+
+    public function reportePdf(Request $request)
+    {
+        $desde = $request->input('desde');
+        $hasta = $request->input('hasta');
+        $estadoFiltro = $request->input('estado');
+        $autorId = $request->input('autor_id');
+        $etiquetaId = $request->input('etiqueta_id');
+
+        $mentorias = Mentoria::query()
+            ->when($estadoFiltro === 'inactiva', fn ($q) => $q->onlyTrashed())
+            ->when(! $estadoFiltro, fn ($q) => $q->withTrashed())
+            ->with(['autor:id,name,primer_apellido', 'etiquetas:id,nombre'])
+            ->when($desde, fn ($q) => $q->whereDate('created_at', '>=', $desde))
+            ->when($hasta, fn ($q) => $q->whereDate('created_at', '<=', $hasta))
+            ->when($autorId, fn ($q) => $q->where('autor_id', $autorId))
+            ->when($etiquetaId, fn ($q) => $q->conEtiquetas([(int) $etiquetaId]))
+            ->orderByDesc('created_at')
+            ->get();
+
+        $etiquetaMultimedia = ['imagen' => 'Imagen', 'documento' => 'Documento', 'video' => 'Video'];
+
+        $filas = $mentorias->map(fn (Mentoria $mentoria) => [
+            'id' => $mentoria->id,
+            'titulo' => $mentoria->titulo,
+            'autor' => trim($mentoria->autor->name . ' ' . $mentoria->autor->primer_apellido),
+            'etiquetas' => $mentoria->etiquetas->pluck('nombre')->implode(', ') ?: '—',
+            'multimedia' => $etiquetaMultimedia[$mentoria->multimedia_tipo] ?? 'Sin multimedia',
+            'fecha_creacion' => $mentoria->created_at->format('d/m/Y'),
+            'estado' => $mentoria->trashed() ? 'Inactiva' : 'Activa',
+        ]);
+
+        $totales = [
+            'total' => $mentorias->count(),
+            'activas' => $mentorias->filter(fn (Mentoria $m) => ! $m->trashed())->count(),
+            'inactivas' => $mentorias->filter(fn (Mentoria $m) => $m->trashed())->count(),
+        ];
+
+        $partesFiltro = [];
+        if ($desde) $partesFiltro[] = 'Desde: ' . Carbon::parse($desde)->format('d/m/Y');
+        if ($hasta) $partesFiltro[] = 'Hasta: ' . Carbon::parse($hasta)->format('d/m/Y');
+        if ($estadoFiltro) $partesFiltro[] = 'Estado: ' . ($estadoFiltro === 'activa' ? 'Activa' : 'Inactiva');
+        if ($autorId && $autor = User::find($autorId)) $partesFiltro[] = 'Autor: ' . trim($autor->name . ' ' . $autor->primer_apellido);
+        if ($etiquetaId && $etiqueta = Etiqueta::find($etiquetaId)) $partesFiltro[] = 'Etiqueta: ' . $etiqueta->nombre;
+
+        $pdf = Pdf::loadView('reportes.mentorias', [
+            'titulo' => 'Reporte de Mentorías',
+            'filtrosTexto' => $partesFiltro ? implode(' | ', $partesFiltro) : 'Sin filtros aplicados',
+            'generadoPor' => trim($request->user()->name . ' ' . $request->user()->primer_apellido),
+            'filas' => $filas,
+            'totales' => $totales,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->stream('reporte-mentorias.pdf');
     }
 
     private function sincronizarEnlaces(Mentoria $mentoria, array $enlaces): void

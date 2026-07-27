@@ -3,7 +3,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import Modal from '@/Components/Modal.vue';
 import { Link, router, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
-import { Eye, Pencil, CalendarPlus, Trash2, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-vue-next';
+import { Eye, Pencil, CalendarPlus, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, FileText } from 'lucide-vue-next';
 
 const props = defineProps({
     certificados: Array,
@@ -12,6 +12,9 @@ const props = defineProps({
     puedeAprobarExamenes: Boolean,
     examenesPendientesCount: Number,
     puedeAdministrarCatalogos: Boolean,
+    puedeGenerarReporte: Boolean,
+    tiposCertificacionFiltro: Array,
+    colaboradoresFiltro: Array,
 });
 
 const q = ref(props.filtros.q ?? '');
@@ -120,6 +123,24 @@ function proponerExamen() {
         onSuccess: () => cerrarModalExamen(),
     });
 }
+
+const mostrarModalReporte = ref(false);
+const reporteFiltros = ref({
+    desde: '',
+    hasta: '',
+    estado: '',
+    tipo_certificado_id: '',
+    colaborador_id: '',
+});
+
+const urlReporte = computed(() => {
+    const parametros = new URLSearchParams();
+    Object.entries(reporteFiltros.value).forEach(([clave, valor]) => {
+        if (valor) parametros.set(clave, valor);
+    });
+    const query = parametros.toString();
+    return `/certificados/reporte${query ? `?${query}` : ''}`;
+});
 </script>
 
 <template>
@@ -136,6 +157,10 @@ function proponerExamen() {
                         class="border px-4 py-2 rounded hover:bg-gray-50">
                         Exámenes pendientes<span v-if="examenesPendientesCount > 0"> ({{ examenesPendientesCount }})</span>
                     </Link>
+                    <button v-if="puedeGenerarReporte" type="button" @click="mostrarModalReporte = true"
+                        class="border px-4 py-2 rounded hover:bg-gray-50 inline-flex items-center gap-2">
+                        <FileText class="h-4 w-4" /> Generar Reporte
+                    </button>
                     <Link v-if="puedeCrear" href="/certificados/create"
                         class="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark">
                         + Nuevo certificado
@@ -259,6 +284,57 @@ function proponerExamen() {
                         </button>
                     </div>
                 </form>
+            </div>
+        </Modal>
+
+        <Modal :show="mostrarModalReporte" @close="mostrarModalReporte = false">
+            <div class="p-6">
+                <h2 class="text-lg font-semibold mb-4">Generar reporte de certificados</h2>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Emisión desde</label>
+                            <input v-model="reporteFiltros.desde" type="date" class="w-full border rounded p-2" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Emisión hasta</label>
+                            <input v-model="reporteFiltros.hasta" type="date" class="w-full border rounded p-2" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Estado</label>
+                        <select v-model="reporteFiltros.estado" class="w-full border rounded p-2">
+                            <option value="">Todos los estados</option>
+                            <option value="verde">Vigente</option>
+                            <option value="amarillo">Por vencer</option>
+                            <option value="rojo">Vencido</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Tipo de certificado</label>
+                        <select v-model="reporteFiltros.tipo_certificado_id" class="w-full border rounded p-2">
+                            <option value="">Todos los tipos</option>
+                            <option v-for="tipo in tiposCertificacionFiltro" :key="tipo.id" :value="tipo.id">{{ tipo.nombre }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Colaborador</label>
+                        <select v-model="reporteFiltros.colaborador_id" class="w-full border rounded p-2">
+                            <option value="">Todos los colaboradores</option>
+                            <option v-for="colaborador in colaboradoresFiltro" :key="colaborador.id" :value="colaborador.id">{{ colaborador.nombre }}</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <a :href="urlReporte" target="_blank"
+                            class="bg-brand text-white px-6 py-2 rounded hover:bg-brand-dark">
+                            Generar PDF
+                        </a>
+                        <button type="button" @click="mostrarModalReporte = false"
+                            class="border px-6 py-2 rounded hover:bg-gray-50">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
             </div>
         </Modal>
     </AppLayout>

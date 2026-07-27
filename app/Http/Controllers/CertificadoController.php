@@ -7,6 +7,8 @@ use App\Models\Certificado;
 use App\Models\CertificadoExamen;
 use App\Models\TipoCertificacion;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -47,6 +49,13 @@ class CertificadoController extends Controller
                 ? CertificadoExamen::where('estado', 'pendiente')->count()
                 : 0,
             'puedeAdministrarCatalogos' => $user->hasRole('Administrador'),
+            'puedeGenerarReporte' => $user->hasAnyRole(['Administrador', 'Controller']),
+            'tiposCertificacionFiltro' => $user->hasAnyRole(['Administrador', 'Controller'])
+                ? TipoCertificacion::orderBy('nombre')->get(['id', 'nombre'])
+                : [],
+            'colaboradoresFiltro' => $user->hasAnyRole(['Administrador', 'Controller'])
+                ? $this->colaboradoresParaSelect()
+                : [],
         ]);
     }
 
@@ -283,6 +292,64 @@ class CertificadoController extends Controller
         ]);
 
         return back()->with('mensaje', $request->accion === 'aprobar' ? 'Examen aprobado.' : 'Examen rechazado.');
+    }
+
+    public function reportePdf(Request $request)
+    {
+        $desde = $request->input('desde');
+        $hasta = $request->input('hasta');
+        $estadoFiltro = $request->input('estado');
+        $tipoCertificadoId = $request->input('tipo_certificado_id');
+        $colaboradorId = $request->input('colaborador_id');
+
+        $hoy = Carbon::today();
+        $umbralAmarillo = $hoy->copy()->addMonths(config('certificados.meses_alerta', 3));
+        $etiquetaEstado = ['verde' => 'Vigente', 'amarillo' => 'Por vencer', 'rojo' => 'Vencido'];
+
+        $certificados = Certificado::query()
+            ->with(['colaborador:id,name,primer_apellido,segundo_apellido,cedula', 'tipoCertificacion:id,nombre'])
+            ->when($desde, fn ($q) => $q->whereDate('fecha_emision', '>=', $desde))
+            ->when($hasta, fn ($q) => $q->whereDate('fecha_emision', '<=', $hasta))
+            ->when($tipoCertificadoId, fn ($q) => $q->where('tipo_certificado_id', $tipoCertificadoId))
+            ->when($colaboradorId, fn ($q) => $q->where('colaborador_id', $colaboradorId))
+            ->when($estadoFiltro === 'rojo', fn ($q) => $q->whereDate('fecha_vencimiento', '<=', $hoy))
+            ->when($estadoFiltro === 'amarillo', fn ($q) => $q->whereDate('fecha_vencimiento', '>', $hoy)->whereDate('fecha_vencimiento', '<=', $umbralAmarillo))
+            ->when($estadoFiltro === 'verde', fn ($q) => $q->whereDate('fecha_vencimiento', '>', $umbralAmarillo))
+            ->orderBy('fecha_vencimiento')
+            ->get();
+
+        $filas = $certificados->map(fn (Certificado $certificado) => [
+            'cedula' => $certificado->colaborador->cedula,
+            'colaborador' => trim($certificado->colaborador->name . ' ' . $certificado->colaborador->primer_apellido . ' ' . $certificado->colaborador->segundo_apellido),
+            'tipo_certificado' => $certificado->tipoCertificacion->nombre,
+            'fecha_emision' => $certificado->fecha_emision->format('d/m/Y'),
+            'fecha_vencimiento' => $certificado->fecha_vencimiento->format('d/m/Y'),
+            'estado' => $etiquetaEstado[$certificado->estado()],
+        ]);
+
+        $totales = [
+            'total' => $certificados->count(),
+            'vigentes' => $certificados->filter(fn (Certificado $c) => $c->estado() === 'verde')->count(),
+            'por_vencer' => $certificados->filter(fn (Certificado $c) => $c->estado() === 'amarillo')->count(),
+            'vencidos' => $certificados->filter(fn (Certificado $c) => $c->estado() === 'rojo')->count(),
+        ];
+
+        $partesFiltro = [];
+        if ($desde) $partesFiltro[] = 'Desde: ' . Carbon::parse($desde)->format('d/m/Y');
+        if ($hasta) $partesFiltro[] = 'Hasta: ' . Carbon::parse($hasta)->format('d/m/Y');
+        if ($estadoFiltro && isset($etiquetaEstado[$estadoFiltro])) $partesFiltro[] = 'Estado: ' . $etiquetaEstado[$estadoFiltro];
+        if ($tipoCertificadoId && $tipo = TipoCertificacion::find($tipoCertificadoId)) $partesFiltro[] = 'Tipo: ' . $tipo->nombre;
+        if ($colaboradorId && $colaborador = User::find($colaboradorId)) $partesFiltro[] = 'Colaborador: ' . trim($colaborador->name . ' ' . $colaborador->primer_apellido);
+
+        $pdf = Pdf::loadView('reportes.certificados', [
+            'titulo' => 'Reporte de Certificados',
+            'filtrosTexto' => $partesFiltro ? implode(' | ', $partesFiltro) : 'Sin filtros aplicados',
+            'generadoPor' => trim($request->user()->name . ' ' . $request->user()->primer_apellido),
+            'filas' => $filas,
+            'totales' => $totales,
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->stream('reporte-certificados.pdf');
     }
 
     private function resolverColaboradorId(Request $request): int

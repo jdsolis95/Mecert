@@ -6,7 +6,6 @@ return [
         'modulo.certificaciones' => 'Certificaciones',
         'modulo.mentorias' => 'Mentorías',
         'modulo.bitacoras' => 'Bitácoras',
-        'modulo.reportes' => 'Reportes',
         'modulo.acerca' => 'Acerca de',
         'modulo.ayuda' => 'Ayuda',
     ],

@@ -39,6 +39,10 @@ Route::middleware(['auth', 'active.user', 'session.idle', 'must.change.password'
         ->except('show')
         ->middleware('role:Administrador');
 
+    Route::get('/mentorias/reporte', [MentoriaController::class, 'reportePdf'])
+        ->middleware('role:Administrador|Controller')
+        ->name('mentorias.reporte');
+
     Route::resource('mentorias', MentoriaController::class)
         ->middleware('permission:modulo.mentorias');
 
@@ -49,6 +53,10 @@ Route::middleware(['auth', 'active.user', 'session.idle', 'must.change.password'
     Route::patch('/etiquetas/{etiqueta}/alternar', [EtiquetaController::class, 'alternar'])
         ->middleware('role:Administrador')
         ->name('etiquetas.alternar');
+
+    Route::get('/certificados/reporte', [CertificadoController::class, 'reportePdf'])
+        ->middleware('role:Administrador|Controller')
+        ->name('certificados.reporte');
 
     Route::resource('certificados', CertificadoController::class)
         ->middleware('permission:modulo.certificaciones');
@@ -81,6 +89,10 @@ Route::middleware(['auth', 'active.user', 'session.idle', 'must.change.password'
     Route::get('/bitacora-accesos', [AccesoController::class, 'index'])
         ->middleware('permission:modulo.bitacoras')
         ->name('bitacora-accesos.index');
+
+    Route::get('/bitacora-accesos/reporte', [AccesoController::class, 'reportePdf'])
+        ->middleware('role:Administrador|Controller')
+        ->name('bitacora-accesos.reporte');
 
     Route::get('/acerca-de', fn() => Inertia::render('Acercade'))->name('acerca-de');
 

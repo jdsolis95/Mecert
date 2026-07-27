@@ -1,7 +1,8 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Modal from '@/Components/Modal.vue';
 import { Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Image as ImageIcon, FileText, Video, LayoutGrid, Grid3x3, List } from 'lucide-vue-next';
 
 //tipo de icono
@@ -13,6 +14,8 @@ const props = defineProps({
     etiquetasDisponibles: Array,
     filtros: Object,
     puedeAdministrarCatalogos: Boolean,
+    puedeGenerarReporte: Boolean,
+    autoresFiltro: Array,
 });
 
 //defiincion tipo de vistas
@@ -57,6 +60,24 @@ function alternarEtiqueta(id) {
     }
     buscar();
 }
+
+const mostrarModalReporte = ref(false);
+const reporteFiltros = ref({
+    desde: '',
+    hasta: '',
+    estado: '',
+    autor_id: '',
+    etiqueta_id: '',
+});
+
+const urlReporte = computed(() => {
+    const parametros = new URLSearchParams();
+    Object.entries(reporteFiltros.value).forEach(([clave, valor]) => {
+        if (valor) parametros.set(clave, valor);
+    });
+    const query = parametros.toString();
+    return `/mentorias/reporte${query ? `?${query}` : ''}`;
+});
 </script>
 
 <template>
@@ -69,6 +90,10 @@ function alternarEtiqueta(id) {
                         class="border px-4 py-2 rounded hover:bg-gray-50">
                         Etiquetas
                     </Link>
+                    <button v-if="puedeGenerarReporte" type="button" @click="mostrarModalReporte = true"
+                        class="border px-4 py-2 rounded hover:bg-gray-50 inline-flex items-center gap-2">
+                        <FileText class="h-4 w-4" /> Generar Reporte
+                    </button>
                     <Link href="/mentorias/create"
                         class="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark">
                         + Agregar Mentoría
@@ -203,5 +228,55 @@ function alternarEtiqueta(id) {
                 </template>
             </div>
         </div>
+
+        <Modal :show="mostrarModalReporte" @close="mostrarModalReporte = false">
+            <div class="p-6">
+                <h2 class="text-lg font-semibold mb-4">Generar reporte de mentorías</h2>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Creación desde</label>
+                            <input v-model="reporteFiltros.desde" type="date" class="w-full border rounded p-2" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Creación hasta</label>
+                            <input v-model="reporteFiltros.hasta" type="date" class="w-full border rounded p-2" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Estado</label>
+                        <select v-model="reporteFiltros.estado" class="w-full border rounded p-2">
+                            <option value="">Todos los estados</option>
+                            <option value="activa">Activa</option>
+                            <option value="inactiva">Inactiva</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Autor</label>
+                        <select v-model="reporteFiltros.autor_id" class="w-full border rounded p-2">
+                            <option value="">Todos los autores</option>
+                            <option v-for="autor in autoresFiltro" :key="autor.id" :value="autor.id">{{ autor.nombre }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Etiqueta</label>
+                        <select v-model="reporteFiltros.etiqueta_id" class="w-full border rounded p-2">
+                            <option value="">Todas las etiquetas</option>
+                            <option v-for="etiqueta in etiquetasDisponibles" :key="etiqueta.id" :value="etiqueta.id">{{ etiqueta.nombre }}</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <a :href="urlReporte" target="_blank"
+                            class="bg-brand text-white px-6 py-2 rounded hover:bg-brand-dark">
+                            Generar PDF
+                        </a>
+                        <button type="button" @click="mostrarModalReporte = false"
+                            class="border px-6 py-2 rounded hover:bg-gray-50">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Modal>
     </AppLayout>
 </template>

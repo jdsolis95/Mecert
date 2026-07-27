@@ -3,7 +3,6 @@ import { computed, ref } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import {
     Award,
-    BarChart3,
     BookOpen,
     CircleHelp,
     ClipboardList,
@@ -63,12 +62,6 @@ const itemsMenu = [
         href: '/bitacoras',
         permiso: 'modulo.bitacoras',
         icono: ClipboardList,
-    },
-    {
-        label: 'Reportes',
-        href: '/reportes',
-        permiso: 'modulo.reportes',
-        icono: BarChart3,
     },
     {
         label: 'Acerca de',
