@@ -12,9 +12,16 @@ class AyudaController extends Controller
 
     public function index(Request $request)
     {
+        $manualExiste = Storage::disk('public')->exists(self::RUTA_MANUAL);
+
         return Inertia::render('Ayuda', [
-            'manualUrl' => route('ayuda.manual'),
-            'manualExiste' => Storage::disk('public')->exists(self::RUTA_MANUAL),
+            // Se agrega la fecha de modificacion como query param para que la URL cambie
+            // al subir un manual nuevo (evita que el iframe y la cache del navegador sigan
+            // mostrando el PDF anterior, ya que antes la URL era siempre la misma).
+            'manualUrl' => $manualExiste
+                ? route('ayuda.manual') . '?v=' . Storage::disk('public')->lastModified(self::RUTA_MANUAL)
+                : route('ayuda.manual'),
+            'manualExiste' => $manualExiste,
             'puedeAdministrar' => $request->user()->hasRole('Administrador'),
         ]);
     }

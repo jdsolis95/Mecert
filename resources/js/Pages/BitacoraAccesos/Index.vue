@@ -103,7 +103,12 @@ function ordenarPor(columna) {
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 text-gray-500 text-left">
                         <tr>
-                            <th class="p-3 font-medium">Código_ingreso</th>
+                            <th class="p-3 font-medium">
+                                <button type="button" @click="ordenarPor('id')" class="inline-flex items-center gap-1 hover:text-gray-900">
+                                    Código de ingreso
+                                    <component :is="filtros.orden === 'id' ? (filtros.direccion === 'asc' ? ChevronUp : ChevronDown) : ChevronsUpDown" class="h-3.5 w-3.5" />
+                                </button>
+                            </th>
                             <th class="p-3 font-medium">
                                 <button type="button" @click="ordenarPor('usuario')" class="inline-flex items-center gap-1 hover:text-gray-900">
                                     Usuario

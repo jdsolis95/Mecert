@@ -13,6 +13,7 @@ class AccesoController extends Controller
 {
     // Columnas ordenables desde los encabezados de la tabla (clave del query param 'orden' => columna SQL real).
     private const COLUMNAS_ORDEN = [
+        'id' => 'accesos.id',
         'usuario' => 'users.primer_apellido',
         'fecha_ingreso' => 'accesos.fecha_ingreso',
         'fecha_salida' => 'accesos.fecha_salida',
