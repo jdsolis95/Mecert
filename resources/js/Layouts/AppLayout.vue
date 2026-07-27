@@ -134,7 +134,7 @@ const estaActivo = (href) => {
                         as="button"
                         class="rounded border border-gray-200 px-3 py-1 text-xs text-gray-500 transition-colors hover:border-red-300 hover:text-red-600"
                     >
-                        Salir
+                        Cerrar Sesión
                     </Link>
                 </div>
 
@@ -178,7 +178,7 @@ const estaActivo = (href) => {
                         as="button"
                         class="rounded border border-red-200 px-3 py-1 text-xs text-red-500"
                     >
-                        Salir
+                        Cerrar Sesión
                     </Link>
                 </div>
             </div>
