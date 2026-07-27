@@ -86,6 +86,10 @@ Route::middleware(['auth', 'active.user', 'session.idle', 'must.change.password'
         ->middleware('permission:modulo.bitacoras')
         ->name('bitacoras.index');
 
+    Route::get('/bitacoras/reporte', [AuditoriaController::class, 'reportePdf'])
+        ->middleware('role:Administrador|Controller')
+        ->name('bitacoras.reporte');
+
     Route::get('/bitacora-accesos', [AccesoController::class, 'index'])
         ->middleware('permission:modulo.bitacoras')
         ->name('bitacora-accesos.index');

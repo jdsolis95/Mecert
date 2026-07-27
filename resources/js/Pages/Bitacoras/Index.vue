@@ -1,15 +1,17 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import BitacorasTabs from '@/Components/BitacorasTabs.vue';
+import Modal from '@/Components/Modal.vue';
 import { Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import { Eye, EyeOff, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
+import { Eye, EyeOff, ChevronUp, ChevronDown, ChevronsUpDown, FileText } from 'lucide-vue-next';
 
 const props = defineProps({
     auditorias: Object,
     filtros: Object,
     modulos: Array,
     usuarios: Array,
+    puedeGenerarReporte: Boolean,
 });
 
 const accion = ref(props.filtros.accion ?? '');
@@ -69,12 +71,36 @@ function ordenarPor(columna) {
 function alternarDetalle(id) {
     expandido.value = expandido.value === id ? null : id;
 }
+
+const mostrarModalReporte = ref(false);
+const reporteFiltros = ref({
+    desde: '',
+    hasta: '',
+    accion: '',
+    modulo: '',
+    usuario_id: '',
+});
+
+const urlReporte = computed(() => {
+    const parametros = new URLSearchParams();
+    Object.entries(reporteFiltros.value).forEach(([clave, valor]) => {
+        if (valor) parametros.set(clave, valor);
+    });
+    const query = parametros.toString();
+    return `/bitacoras/reporte${query ? `?${query}` : ''}`;
+});
 </script>
 
 <template>
     <AppLayout title="Bitácoras">
         <div class="p-6">
-            <h1 class="text-2xl font-semibold text-gray-800 mb-6">Bitácoras</h1>
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-semibold text-gray-800">Bitácoras</h1>
+                <button v-if="puedeGenerarReporte" type="button" @click="mostrarModalReporte = true"
+                    class="border px-4 py-2 rounded hover:bg-gray-50 inline-flex items-center gap-2">
+                    <FileText class="h-4 w-4" /> Generar Reporte
+                </button>
+            </div>
 
             <BitacorasTabs activa="movimientos" />
 
@@ -197,5 +223,56 @@ function alternarDetalle(id) {
                 </template>
             </div>
         </div>
+
+        <Modal :show="mostrarModalReporte" @close="mostrarModalReporte = false">
+            <div class="p-6">
+                <h2 class="text-lg font-semibold mb-4">Generar reporte de movimientos</h2>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Desde</label>
+                            <input v-model="reporteFiltros.desde" type="date" class="w-full border rounded p-2" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Hasta</label>
+                            <input v-model="reporteFiltros.hasta" type="date" class="w-full border rounded p-2" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Acción</label>
+                        <select v-model="reporteFiltros.accion" class="w-full border rounded p-2">
+                            <option value="">Todas</option>
+                            <option value="creado">Creación</option>
+                            <option value="modificado">Modificación</option>
+                            <option value="eliminado">Eliminación</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Módulo</label>
+                        <select v-model="reporteFiltros.modulo" class="w-full border rounded p-2">
+                            <option value="">Todos</option>
+                            <option v-for="opcion in modulos" :key="opcion" :value="opcion">{{ opcion }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Usuario</label>
+                        <select v-model="reporteFiltros.usuario_id" class="w-full border rounded p-2">
+                            <option value="">Todos</option>
+                            <option v-for="usuario in usuarios" :key="usuario.id" :value="usuario.id">{{ usuario.nombre }}</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <a :href="urlReporte" target="_blank"
+                            class="bg-brand text-white px-6 py-2 rounded hover:bg-brand-dark">
+                            Generar PDF
+                        </a>
+                        <button type="button" @click="mostrarModalReporte = false"
+                            class="border px-6 py-2 rounded hover:bg-gray-50">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Modal>
     </AppLayout>
 </template>

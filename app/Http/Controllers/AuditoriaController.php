@@ -6,6 +6,8 @@ use App\Models\Auditoria;
 use App\Models\Certificado;
 use App\Models\Mentoria;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -78,7 +80,60 @@ class AuditoriaController extends Controller
                     'id' => $usuario->id,
                     'nombre' => trim($usuario->name . ' ' . $usuario->primer_apellido),
                 ]),
+            'puedeGenerarReporte' => $request->user()->hasAnyRole(['Administrador', 'Controller']),
         ]);
+    }
+
+    public function reportePdf(Request $request)
+    {
+        $accion = $request->input('accion');
+        $modulo = $request->input('modulo');
+        $usuarioId = $request->input('usuario_id');
+        $desde = $request->input('desde');
+        $hasta = $request->input('hasta');
+
+        $auditorias = Auditoria::query()
+            ->with('usuario:id,name,primer_apellido')
+            ->when($accion, fn ($q) => $q->where('accion', $accion))
+            ->when($modulo && isset(self::MODULOS[$modulo]), fn ($q) => $q->where('auditable_type', self::MODULOS[$modulo]))
+            ->when($usuarioId, fn ($q) => $q->where('usuario_id', $usuarioId))
+            ->when($desde, fn ($q) => $q->whereDate('created_at', '>=', $desde))
+            ->when($hasta, fn ($q) => $q->whereDate('created_at', '<=', $hasta))
+            ->orderByDesc('created_at')
+            ->get();
+
+        $filas = $auditorias->map(fn (Auditoria $auditoria) => [
+            'fecha' => $auditoria->created_at->format('d/m/Y H:i'),
+            'modulo' => $this->nombreModulo($auditoria->auditable_type),
+            'accion' => ucfirst($auditoria->accion),
+            'usuario' => $auditoria->usuario
+                ? trim($auditoria->usuario->name . ' ' . $auditoria->usuario->primer_apellido)
+                : 'Usuario eliminado',
+        ]);
+
+        $totales = [
+            'total' => $auditorias->count(),
+            'creados' => $auditorias->where('accion', 'creado')->count(),
+            'modificados' => $auditorias->where('accion', 'modificado')->count(),
+            'eliminados' => $auditorias->where('accion', 'eliminado')->count(),
+        ];
+
+        $partesFiltro = [];
+        if ($desde) $partesFiltro[] = 'Desde: ' . Carbon::parse($desde)->format('d/m/Y');
+        if ($hasta) $partesFiltro[] = 'Hasta: ' . Carbon::parse($hasta)->format('d/m/Y');
+        if ($accion) $partesFiltro[] = 'Acción: ' . ucfirst($accion);
+        if ($modulo && isset(self::MODULOS[$modulo])) $partesFiltro[] = 'Módulo: ' . $modulo;
+        if ($usuarioId && $usuario = User::find($usuarioId)) $partesFiltro[] = 'Usuario: ' . trim($usuario->name . ' ' . $usuario->primer_apellido);
+
+        $pdf = Pdf::loadView('reportes.bitacoras-movimientos', [
+            'titulo' => 'Reporte de Bitácora de Movimientos',
+            'filtrosTexto' => $partesFiltro ? implode(' | ', $partesFiltro) : 'Sin filtros aplicados',
+            'generadoPor' => trim($request->user()->name . ' ' . $request->user()->primer_apellido),
+            'filas' => $filas,
+            'totales' => $totales,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->stream('reporte-bitacora-movimientos.pdf');
     }
 
     private function nombreModulo(string $auditableType): string
