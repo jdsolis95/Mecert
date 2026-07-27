@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('certificados:notificar-vencimientos')->daily();
 Schedule::command('certificados:eliminar-vencidos')->dailyAt('01:00');
+Schedule::command('accesos:cerrar-abandonados')->everyFiveMinutes();
