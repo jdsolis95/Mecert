@@ -46,7 +46,7 @@ const itemsMenu = [
         icono: ShieldCheck,
     },
     {
-        label: 'Certificaciones',
+        label: 'Certificados',
         href: '/certificados',
         permiso: 'modulo.certificaciones',
         icono: Award,
