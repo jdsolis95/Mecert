@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,7 +25,19 @@ class Mentoria extends Model
         'multimedia_nombre_original',
         'multimedia_url',
         'eliminado_por_id',
+        'fecha_vencimiento',
+        'notificado_amarillo_en',
+        'notificado_rojo_en',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'fecha_vencimiento' => 'date',
+            'notificado_amarillo_en' => 'datetime',
+            'notificado_rojo_en' => 'datetime',
+        ];
+    }
 
     public function autor(): BelongsTo
     {
@@ -70,6 +83,35 @@ class Mentoria extends Model
         return $query->whereHas('etiquetas', fn (Builder $eq) => $eq->whereIn('etiquetas.id', $etiquetaIds));
     }
 
+    // Semáforo de vigencia: null si la mentoría no tiene control de vigencia (fecha_vencimiento vacía),
+    // rojo si ya venció, amarillo dentro de la ventana de aviso, verde fuera de ella.
+    public function estado(): ?string
+    {
+        if (! $this->fecha_vencimiento) {
+            return null;
+        }
+
+        $hoy = Carbon::today();
+        $vencimiento = Carbon::parse($this->fecha_vencimiento);
+
+        if ($vencimiento->lte($hoy)) {
+            return 'rojo';
+        }
+
+        $umbral = $hoy->copy()->addMonths(config('mentorias.meses_alerta', 3));
+
+        return $vencimiento->lte($umbral) ? 'amarillo' : 'verde';
+    }
+
+    public function diasRestantes(): ?int
+    {
+        if (! $this->fecha_vencimiento) {
+            return null;
+        }
+
+        return Carbon::today()->diffInDays(Carbon::parse($this->fecha_vencimiento), false);
+    }
+
     // Estado actual auditable (para las bitácoras de creación/edición/eliminación).
     public function snapshotAuditoria(): array
     {
@@ -82,6 +124,7 @@ class Mentoria extends Model
             'multimedia_nombre_original' => $this->multimedia_nombre_original,
             'multimedia_url' => $this->multimedia_url,
             'enlaces' => $this->enlaces()->get(['url', 'texto'])->toArray(),
+            'fecha_vencimiento' => $this->fecha_vencimiento?->toDateString(),
         ];
     }
 
@@ -99,6 +142,7 @@ class Mentoria extends Model
                 'multimedia_nombre_original' => $this->getOriginal('multimedia_nombre_original'),
                 'multimedia_url' => $this->getOriginal('multimedia_url'),
                 'enlaces' => $this->enlaces()->get(['url', 'texto'])->toArray(),
+                'fecha_vencimiento' => $this->getOriginal('fecha_vencimiento'),
             ],
         ]);
     }

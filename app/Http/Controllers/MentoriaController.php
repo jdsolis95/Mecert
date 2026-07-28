@@ -67,6 +67,7 @@ class MentoriaController extends Controller
                 'titulo' => $request->titulo,
                 'descripcion' => $request->descripcion,
                 'autor_id' => $request->user()->id,
+                'fecha_vencimiento' => $request->fecha_vencimiento,
                 ...$this->resolverMultimedia($request),
             ]);
 
@@ -94,6 +95,8 @@ class MentoriaController extends Controller
                 'etiquetas' => $mentoria->etiquetas->map(fn ($e) => ['id' => $e->id, 'nombre' => $e->nombre])->all(),
                 'multimedia' => $this->mapaMultimedia($mentoria),
                 'enlaces' => $mentoria->enlaces->map(fn ($e) => ['url' => $e->url, 'texto' => $e->texto])->all(),
+                'fecha_vencimiento' => $mentoria->fecha_vencimiento?->format('d/m/Y'),
+                'estado' => $mentoria->estado(),
             ],
             'puedeEditar' => $request->user()->can('update', $mentoria),
         ]);
@@ -116,6 +119,7 @@ class MentoriaController extends Controller
                 'multimedia_url' => $mentoria->multimedia_url,
                 'multimedia_nombre_original' => $mentoria->multimedia_nombre_original,
                 'multimedia_preview_url' => $mentoria->multimedia_path ? Storage::url($mentoria->multimedia_path) : null,
+                'fecha_vencimiento' => $mentoria->fecha_vencimiento?->toDateString(),
             ],
             // Etiquetas activas + las ya asignadas a esta mentoria aunque hayan sido deshabilitadas despues
             'etiquetasDisponibles' => Etiqueta::activas()
@@ -136,9 +140,15 @@ class MentoriaController extends Controller
 
             $mentoria->registrarHistorial($request->user()->id);
 
+            // Si cambia la fecha de vencimiento se reabre la ventana de alerta (evita reenvíos si solo se edita título/etiquetas).
+            $nuevaFechaVencimiento = $request->fecha_vencimiento ?: null;
+            $cambioVigencia = optional($mentoria->fecha_vencimiento)->toDateString() !== $nuevaFechaVencimiento;
+
             $mentoria->update([
                 'titulo' => $request->titulo,
                 'descripcion' => $request->descripcion,
+                'fecha_vencimiento' => $nuevaFechaVencimiento,
+                ...($cambioVigencia ? ['notificado_amarillo_en' => null, 'notificado_rojo_en' => null] : []),
                 ...$this->resolverMultimedia($request, $mentoria),
             ]);
 
@@ -246,6 +256,8 @@ class MentoriaController extends Controller
             'fecha' => $mentoria->created_at->format('d/m/Y'),
             'etiquetas' => $mentoria->etiquetas->map(fn ($e) => ['id' => $e->id, 'nombre' => $e->nombre])->all(),
             'multimedia' => $this->mapaMultimedia($mentoria),
+            'fecha_vencimiento' => $mentoria->fecha_vencimiento?->format('d/m/Y'),
+            'estado' => $mentoria->estado(),
         ];
     }
 
@@ -353,6 +365,8 @@ class MentoriaController extends Controller
             'enlaces' => ['nullable', 'array'],
             'enlaces.*.url' => ['required', 'url', 'max:2048'],
             'enlaces.*.texto' => ['nullable', 'string', 'max:150'],
+
+            'fecha_vencimiento' => ['nullable', 'date'],
         ];
     }
 

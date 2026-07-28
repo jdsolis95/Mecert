@@ -12,6 +12,18 @@ function eliminar() {
         router.delete(`/mentorias/${props.mentoria.id}`);
     }
 }
+
+const estiloEstado = {
+    verde: 'bg-green-100 text-green-700',
+    amarillo: 'bg-yellow-100 text-yellow-700',
+    rojo: 'bg-red-100 text-red-700',
+};
+
+const etiquetaEstado = {
+    verde: 'Vigente',
+    amarillo: 'Por vencer',
+    rojo: 'Vencido',
+};
 </script>
 
 <template>
@@ -25,7 +37,14 @@ function eliminar() {
 
                 <div class="p-6">
                     <h1 class="text-2xl font-semibold text-gray-800 mb-2">{{ mentoria.titulo }}</h1>
-                    <p class="text-xs text-gray-400 mb-4">{{ mentoria.autor }} · {{ mentoria.fecha }}</p>
+                    <p class="text-xs text-gray-400 mb-2">{{ mentoria.autor }} · {{ mentoria.fecha }}</p>
+
+                    <div v-if="mentoria.estado" class="flex items-center gap-2 mb-4">
+                        <span :class="estiloEstado[mentoria.estado]" class="px-2 py-1 rounded text-xs font-medium">
+                            {{ etiquetaEstado[mentoria.estado] }}
+                        </span>
+                        <span class="text-xs text-gray-400">Vence: {{ mentoria.fecha_vencimiento }}</span>
+                    </div>
 
                     <div v-if="mentoria.etiquetas.length" class="flex flex-wrap gap-1 mb-4">
                         <span v-for="etiqueta in mentoria.etiquetas" :key="etiqueta.id"

@@ -13,6 +13,7 @@ const form = useForm({
     multimedia_tipo: '',
     multimedia_archivo: null,
     enlaces: [],
+    fecha_vencimiento: '',
 });
 
 function alSeleccionarArchivo(evento) {
@@ -114,6 +115,17 @@ function guardar() {
                         class="border px-4 py-1 rounded text-sm hover:bg-gray-50">
                         + Agregar enlace
                     </button>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1">Fecha de vencimiento (opcional)</label>
+                    <input v-model="form.fecha_vencimiento" type="date" class="w-full border rounded p-2" />
+                    <p class="text-xs text-gray-400 mt-1">
+                        Déjalo vacío si esta mentoría no requiere control de vigencia.
+                    </p>
+                    <p v-if="form.errors.fecha_vencimiento" class="text-red-500 text-xs mt-1">
+                        {{ form.errors.fecha_vencimiento }}
+                    </p>
                 </div>
 
                 <div class="flex gap-3 pt-4">

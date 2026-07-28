@@ -8,6 +8,18 @@ import { Image as ImageIcon, FileText, Video, LayoutGrid, Grid3x3, List } from '
 //tipo de icono
 const iconoPorTipo = { imagen: ImageIcon, documento: FileText, video: Video };
 
+const estiloEstado = {
+    verde: 'bg-green-100 text-green-700',
+    amarillo: 'bg-yellow-100 text-yellow-700',
+    rojo: 'bg-red-100 text-red-700',
+};
+
+const etiquetaEstado = {
+    verde: 'Vigente',
+    amarillo: 'Por vencer',
+    rojo: 'Vencido',
+};
+
 //definir props
 const props = defineProps({
     mentorias: Object,
@@ -169,7 +181,13 @@ const urlReporte = computed(() => {
                             </span>
                         </div>
 
-                        <p class="text-xs text-gray-400">{{ mentoria.autor }} · {{ mentoria.fecha }}</p>
+                        <div class="flex items-center justify-between gap-2">
+                            <p class="text-xs text-gray-400">{{ mentoria.autor }} · {{ mentoria.fecha }}</p>
+                            <span v-if="mentoria.estado" :class="estiloEstado[mentoria.estado]"
+                                class="px-2 py-0.5 rounded text-xs font-medium shrink-0">
+                                {{ etiquetaEstado[mentoria.estado] }}
+                            </span>
+                        </div>
                     </div>
                 </Link>
             </div>
@@ -215,6 +233,10 @@ const urlReporte = computed(() => {
                         </div>
                     </div>
 
+                    <span v-if="mentoria.estado" :class="estiloEstado[mentoria.estado]"
+                        class="px-2 py-0.5 rounded text-xs font-medium shrink-0">
+                        {{ etiquetaEstado[mentoria.estado] }}
+                    </span>
                     <p class="text-xs text-gray-400 shrink-0 whitespace-nowrap">{{ mentoria.autor }} · {{ mentoria.fecha }}</p>
                 </Link>
             </div>

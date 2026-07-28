@@ -1,0 +1,28 @@
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
+    <div style="background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+
+        <h2 style="color: #333; margin-bottom: 20px;">Hola {{ $mentoria->autor->name }},</h2>
+
+        <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+            @if ($estado === 'rojo')
+                Tu mentoría <strong>{{ $mentoria->titulo }}</strong> ya venció. Es necesario revisar y actualizar su contenido lo antes posible.
+            @else
+                Tu mentoría <strong>{{ $mentoria->titulo }}</strong> está próxima a vencer. Te recomendamos revisar y actualizar su contenido con tiempo.
+            @endif
+        </p>
+
+        <div style="background-color: #f9f9f9; border-left: 4px solid {{ $estado === 'rojo' ? '#e53935' : '#fbc02d' }}; padding: 15px; margin: 20px 0; border-radius: 4px;">
+            <p style="margin: 0; color: #333;"><strong>Autor:</strong> {{ $mentoria->autor->name }} {{ $mentoria->autor->primer_apellido }}</p>
+            <p style="margin: 10px 0 0 0; color: #333;"><strong>Título:</strong> {{ $mentoria->titulo }}</p>
+            <p style="margin: 10px 0 0 0; color: #333;"><strong>Fecha de vencimiento:</strong> {{ $mentoria->fecha_vencimiento->format('d/m/Y') }}</p>
+        </div>
+
+        <p style="color: #999; font-size: 12px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+            Este es un correo automático del módulo de mentorías de MeCert.
+        </p>
+
+        <p style="color: #999; font-size: 12px; margin-top: 10px;">
+            Sistema MeCert - Gestión de Mentorías
+        </p>
+    </div>
+</div>
