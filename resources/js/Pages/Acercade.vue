@@ -9,7 +9,8 @@ import AppLayout from '@/Layouts/AppLayout.vue'
             <div class="text-center">
                 <h1 class="text-3xl font-bold text-brand-darker">MeCert</h1>
                 <p class="text-gray-500 text-sm mt-1">
-                    Sistema de Mentorías y Certificaciones
+                    <span>Sistema de Mentorías y Certificaciones</span>
+                </p>
             </div>
 
             <hr class="border-gray-100" />
