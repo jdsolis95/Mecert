@@ -23,6 +23,7 @@ class CertificadoExamen extends Model
         'comentario',
         'decidido_por_id',
         'decidido_at',
+        'notificado_recordatorio_en',
     ];
 
     protected function casts(): array
@@ -31,6 +32,7 @@ class CertificadoExamen extends Model
             'fecha_propuesta' => 'date',
             'fecha_aprobada' => 'date',
             'decidido_at' => 'datetime',
+            'notificado_recordatorio_en' => 'datetime',
         ];
     }
 

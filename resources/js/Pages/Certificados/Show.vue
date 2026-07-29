@@ -60,6 +60,18 @@ const estiloEstadoExamen = {
                     <p class="font-medium">{{ certificado.tipo_certificado }}</p>
                 </div>
                 <div>
+                    <p class="text-sm text-gray-500">Nombre del certificado</p>
+                    <p class="font-medium">{{ certificado.nombre_certificado || '—' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Emisor</p>
+                    <p class="font-medium">{{ certificado.emisor || '—' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Código del certificado</p>
+                    <p class="font-medium">{{ certificado.codigo_certificado || '—' }}</p>
+                </div>
+                <div>
                     <p class="text-sm text-gray-500">Fecha de emisión</p>
                     <p class="font-medium">{{ certificado.fecha_emision }}</p>
                 </div>

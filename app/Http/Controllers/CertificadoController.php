@@ -89,6 +89,9 @@ class CertificadoController extends Controller
             $certificado = Certificado::create([
                 'colaborador_id' => $colaboradorId,
                 'tipo_certificado_id' => $request->tipo_certificado_id,
+                'nombre_certificado' => $request->nombre_certificado,
+                'emisor' => $request->emisor,
+                'codigo_certificado' => $request->codigo_certificado,
                 'fecha_emision' => $request->fecha_emision,
                 'fecha_vencimiento' => $request->fecha_vencimiento,
                 ...$this->resolverDocumento($request),
@@ -119,6 +122,9 @@ class CertificadoController extends Controller
                 'id' => $certificado->id,
                 'colaborador' => trim($certificado->colaborador->name . ' ' . $certificado->colaborador->primer_apellido),
                 'tipo_certificado' => $certificado->tipoCertificacion->nombre,
+                'nombre_certificado' => $certificado->nombre_certificado,
+                'emisor' => $certificado->emisor,
+                'codigo_certificado' => $certificado->codigo_certificado,
                 'fecha_emision' => $certificado->fecha_emision->format('d/m/Y'),
                 'fecha_vencimiento' => $certificado->fecha_vencimiento->format('d/m/Y'),
                 'estado' => $certificado->estado(),
@@ -161,6 +167,9 @@ class CertificadoController extends Controller
                 'id' => $certificado->id,
                 'colaborador_id' => $certificado->colaborador_id,
                 'tipo_certificado_id' => $certificado->tipo_certificado_id,
+                'nombre_certificado' => $certificado->nombre_certificado,
+                'emisor' => $certificado->emisor,
+                'codigo_certificado' => $certificado->codigo_certificado,
                 'fecha_emision' => $certificado->fecha_emision->toDateString(),
                 'fecha_vencimiento' => $certificado->fecha_vencimiento->toDateString(),
                 'documento_nombre_original' => $certificado->documento_nombre_original,
@@ -198,6 +207,9 @@ class CertificadoController extends Controller
             $certificado->update([
                 'colaborador_id' => $colaboradorId,
                 'tipo_certificado_id' => $request->tipo_certificado_id,
+                'nombre_certificado' => $request->nombre_certificado,
+                'emisor' => $request->emisor,
+                'codigo_certificado' => $request->codigo_certificado,
                 'fecha_emision' => $request->fecha_emision,
                 'fecha_vencimiento' => $request->fecha_vencimiento,
                 // Si cambió la fecha de vencimiento, se reabre la ventana de avisos.
@@ -289,6 +301,8 @@ class CertificadoController extends Controller
             'comentario' => $request->comentario,
             'decidido_por_id' => $request->user()->id,
             'decidido_at' => now(),
+            // Reabre la ventana del recordatorio si se (re)aprueba con una nueva fecha de examen.
+            'notificado_recordatorio_en' => null,
         ]);
 
         return back()->with('mensaje', $request->accion === 'aprobar' ? 'Examen aprobado.' : 'Examen rechazado.');
@@ -398,6 +412,8 @@ class CertificadoController extends Controller
             'id' => $certificado->id,
             'colaborador' => trim($certificado->colaborador->name . ' ' . $certificado->colaborador->primer_apellido),
             'tipo_certificado' => $certificado->tipoCertificacion->nombre,
+            'nombre_certificado' => $certificado->nombre_certificado,
+            'codigo_certificado' => $certificado->codigo_certificado,
             'fecha_emision' => $certificado->fecha_emision->format('d/m/Y'),
             'fecha_vencimiento' => $certificado->fecha_vencimiento->format('d/m/Y'),
             'estado' => $certificado->estado(),
@@ -420,6 +436,9 @@ class CertificadoController extends Controller
                     ->where(fn ($query) => $query->where('colaborador_id', $colaboradorId)->whereNull('deleted_at'))
                     ->ignore($certificado?->id),
             ],
+            'nombre_certificado' => ['required', 'string', 'max:150'],
+            'emisor' => ['required', 'string', 'max:150'],
+            'codigo_certificado' => ['required', 'string', 'max:100'],
             'fecha_emision' => ['required', 'date', 'before:fecha_vencimiento'],
             'fecha_vencimiento' => ['required', 'date', 'after:fecha_emision'],
             'documento_adjunto' => ['nullable', 'file', 'max:5120', 'mimes:pdf,jpg,jpeg,png'],

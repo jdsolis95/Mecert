@@ -194,6 +194,7 @@ const urlReporte = computed(() => {
                             </button>
                         </th>
                         <th class="p-3 text-left text-sm">Tipo de certificado</th>
+                        <th class="p-3 text-left text-sm">Nombre / Código</th>
                         <th class="p-3 text-left text-sm">
                             <button type="button" @click="ordenarPor('fecha_emision')" class="inline-flex items-center gap-1 hover:text-gray-900">
                                 Emisión
@@ -220,6 +221,10 @@ const urlReporte = computed(() => {
                         class="border-t even:bg-gray-50 hover:bg-gray-100">
                         <td class="p-3 text-sm">{{ certificado.colaborador }}</td>
                         <td class="p-3 text-sm">{{ certificado.tipo_certificado }}</td>
+                        <td class="p-3 text-sm">
+                            <p>{{ certificado.nombre_certificado || '—' }}</p>
+                            <p class="text-xs text-gray-400">{{ certificado.codigo_certificado || '' }}</p>
+                        </td>
                         <td class="p-3 text-sm">{{ certificado.fecha_emision }}</td>
                         <td class="p-3 text-sm">{{ certificado.fecha_vencimiento }}</td>
                         <td class="p-3 text-sm">

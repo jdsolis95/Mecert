@@ -9,6 +9,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('certificados:notificar-vencimientos')->daily();
+Schedule::command('certificados:notificar-examenes-proximos')->daily();
 Schedule::command('certificados:eliminar-vencidos')->dailyAt('01:00');
 Schedule::command('mentorias:notificar-vencimientos')->daily();
 Schedule::command('accesos:cerrar-abandonados')->everyFiveMinutes();

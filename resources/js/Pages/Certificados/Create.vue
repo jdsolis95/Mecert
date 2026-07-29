@@ -11,6 +11,9 @@ const props = defineProps({
 const form = useForm({
     colaborador_id: props.colaboradorFijo?.id ?? '',
     tipo_certificado_id: '',
+    nombre_certificado: '',
+    emisor: '',
+    codigo_certificado: '',
     fecha_emision: '',
     fecha_vencimiento: '',
     documento_adjunto: null,
@@ -61,6 +64,34 @@ function guardar() {
                     <p v-if="form.errors.tipo_certificado_id" class="text-red-500 text-xs mt-1">
                         {{ form.errors.tipo_certificado_id }}
                     </p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1">Nombre del certificado</label>
+                    <input v-model="form.nombre_certificado" type="text" required
+                        class="w-full border rounded p-2" />
+                    <p v-if="form.errors.nombre_certificado" class="text-red-500 text-xs mt-1">
+                        {{ form.errors.nombre_certificado }}
+                    </p>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium mb-1">Emisor</label>
+                        <input v-model="form.emisor" type="text" required
+                            class="w-full border rounded p-2" />
+                        <p v-if="form.errors.emisor" class="text-red-500 text-xs mt-1">
+                            {{ form.errors.emisor }}
+                        </p>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium mb-1">Código del certificado</label>
+                        <input v-model="form.codigo_certificado" type="text" required
+                            class="w-full border rounded p-2" />
+                        <p v-if="form.errors.codigo_certificado" class="text-red-500 text-xs mt-1">
+                            {{ form.errors.codigo_certificado }}
+                        </p>
+                    </div>
                 </div>
 
                 <div class="flex gap-4">

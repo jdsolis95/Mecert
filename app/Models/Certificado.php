@@ -18,6 +18,9 @@ class Certificado extends Model
     protected $fillable = [
         'colaborador_id',
         'tipo_certificado_id',
+        'nombre_certificado',
+        'emisor',
+        'codigo_certificado',
         'fecha_emision',
         'fecha_vencimiento',
         'documento_path',
@@ -105,6 +108,9 @@ class Certificado extends Model
             'colaborador_id' => $this->colaborador_id,
             // find() fresco por id (no la relacion cacheada) para que "antes" y "despues" no arrastren un valor viejo
             'tipo_certificado' => TipoCertificacion::find($this->tipo_certificado_id)?->nombre,
+            'nombre_certificado' => $this->nombre_certificado,
+            'emisor' => $this->emisor,
+            'codigo_certificado' => $this->codigo_certificado,
             'fecha_emision' => $this->fecha_emision?->toDateString(),
             'fecha_vencimiento' => $this->fecha_vencimiento?->toDateString(),
             'documento_path' => $this->documento_path,
@@ -119,6 +125,9 @@ class Certificado extends Model
             'editado_por_id' => $editadoPorId,
             'datos_anteriores' => [
                 'tipo_certificado' => TipoCertificacion::find($this->getOriginal('tipo_certificado_id'))?->nombre,
+                'nombre_certificado' => $this->getOriginal('nombre_certificado'),
+                'emisor' => $this->getOriginal('emisor'),
+                'codigo_certificado' => $this->getOriginal('codigo_certificado'),
                 'fecha_emision' => $this->getOriginal('fecha_emision'),
                 'fecha_vencimiento' => $this->getOriginal('fecha_vencimiento'),
                 'documento_path' => $this->getOriginal('documento_path'),
