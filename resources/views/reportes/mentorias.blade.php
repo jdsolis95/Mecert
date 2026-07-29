@@ -14,6 +14,8 @@
                     <th>Tipo multimedia</th>
                     <th>Fecha creación</th>
                     <th>Estado</th>
+                    <th>Fecha vencimiento</th>
+                    <th>Vigencia</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,6 +28,8 @@
                         <td>{{ $fila['multimedia'] }}</td>
                         <td>{{ $fila['fecha_creacion'] }}</td>
                         <td>{{ $fila['estado'] }}</td>
+                        <td>{{ $fila['fecha_vencimiento'] }}</td>
+                        <td>{{ $fila['vigencia'] }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -34,7 +38,9 @@
         <div class="totales">
             <strong>Total de mentorías: {{ $totales['total'] }}</strong><br>
             Activas: {{ $totales['activas'] }} &middot;
-            Inactivas: {{ $totales['inactivas'] }}
+            Inactivas: {{ $totales['inactivas'] }} &middot;
+            Por vencer: {{ $totales['por_vencer'] }} &middot;
+            Vencidas: {{ $totales['vencidas'] }}
         </div>
     @endif
 @endsection

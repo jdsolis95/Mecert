@@ -47,10 +47,11 @@ function cambiarVista(valor) {
 
 const q = ref(props.filtros.q ?? '');
 const seleccionadas = ref([...(props.filtros.etiquetas ?? [])]);
+const estado = ref(props.filtros.estado ?? '');
 let temporizador = null;
 
 function buscar() {
-    router.get('/mentorias', { q: q.value, etiquetas: seleccionadas.value }, {
+    router.get('/mentorias', { q: q.value, etiquetas: seleccionadas.value, estado: estado.value }, {
         preserveState: true,
         preserveScroll: true,
         replace: true,
@@ -113,10 +114,17 @@ const urlReporte = computed(() => {
                 </div>
             </div>
 
-            <div class="mb-4">
+            <div class="mb-4 flex gap-3">
                 <input v-model="q" @input="alEscribir" type="text"
                     placeholder="Buscar por título, autor o etiqueta..."
-                    class="w-full border rounded p-2" />
+                    class="flex-1 border rounded p-2" />
+                <select v-model="estado" @change="buscar" class="border rounded p-2">
+                    <option value="">Todas las vigencias</option>
+                    <option value="verde">Vigente</option>
+                    <option value="amarillo">Por vencer</option>
+                    <option value="rojo">Vencido</option>
+                    <option value="sin_vigencia">Sin vigencia</option>
+                </select>
             </div>
 
             <div v-if="etiquetasDisponibles.length" class="flex flex-wrap gap-2 mb-6">

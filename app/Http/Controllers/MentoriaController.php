@@ -24,10 +24,18 @@ class MentoriaController extends Controller
             ->map(fn ($id) => (int) $id)
             ->all();
 
+        $estadoFiltro = $request->input('estado');
+        $hoy = Carbon::today();
+        $umbralAmarillo = $hoy->copy()->addMonths(config('mentorias.meses_alerta', 3));
+
         $mentorias = Mentoria::query()
             ->with(['autor:id,name,primer_apellido', 'etiquetas:id,nombre'])
             ->when($request->filled('q'), fn ($query) => $query->buscar($request->string('q')->toString()))
             ->when(count($etiquetaIds) > 0, fn ($query) => $query->conEtiquetas($etiquetaIds))
+            ->when($estadoFiltro === 'rojo', fn ($q) => $q->whereDate('fecha_vencimiento', '<=', $hoy))
+            ->when($estadoFiltro === 'amarillo', fn ($q) => $q->whereDate('fecha_vencimiento', '>', $hoy)->whereDate('fecha_vencimiento', '<=', $umbralAmarillo))
+            ->when($estadoFiltro === 'verde', fn ($q) => $q->whereDate('fecha_vencimiento', '>', $umbralAmarillo))
+            ->when($estadoFiltro === 'sin_vigencia', fn ($q) => $q->whereNull('fecha_vencimiento'))
             ->latest()
             ->paginate(12)
             ->withQueryString()
@@ -41,6 +49,7 @@ class MentoriaController extends Controller
             'filtros' => [
                 'q' => $request->input('q', ''),
                 'etiquetas' => $etiquetaIds,
+                'estado' => $estadoFiltro ?? '',
             ],
             'puedeAdministrarCatalogos' => $request->user()->hasRole('Administrador'),
             'puedeGenerarReporte' => $puedeGenerarReporte,
@@ -196,6 +205,7 @@ class MentoriaController extends Controller
             ->get();
 
         $etiquetaMultimedia = ['imagen' => 'Imagen', 'documento' => 'Documento', 'video' => 'Video'];
+        $etiquetaVigencia = ['verde' => 'Vigente', 'amarillo' => 'Por vencer', 'rojo' => 'Vencido'];
 
         $filas = $mentorias->map(fn (Mentoria $mentoria) => [
             'id' => $mentoria->id,
@@ -205,12 +215,16 @@ class MentoriaController extends Controller
             'multimedia' => $etiquetaMultimedia[$mentoria->multimedia_tipo] ?? 'Sin multimedia',
             'fecha_creacion' => $mentoria->created_at->format('d/m/Y'),
             'estado' => $mentoria->trashed() ? 'Inactiva' : 'Activa',
+            'fecha_vencimiento' => $mentoria->fecha_vencimiento?->format('d/m/Y') ?? '—',
+            'vigencia' => $mentoria->fecha_vencimiento ? $etiquetaVigencia[$mentoria->estado()] : 'Sin vigencia',
         ]);
 
         $totales = [
             'total' => $mentorias->count(),
             'activas' => $mentorias->filter(fn (Mentoria $m) => ! $m->trashed())->count(),
             'inactivas' => $mentorias->filter(fn (Mentoria $m) => $m->trashed())->count(),
+            'vencidas' => $mentorias->filter(fn (Mentoria $m) => $m->estado() === 'rojo')->count(),
+            'por_vencer' => $mentorias->filter(fn (Mentoria $m) => $m->estado() === 'amarillo')->count(),
         ];
 
         $partesFiltro = [];
@@ -226,7 +240,7 @@ class MentoriaController extends Controller
             'generadoPor' => trim($request->user()->name . ' ' . $request->user()->primer_apellido),
             'filas' => $filas,
             'totales' => $totales,
-        ])->setPaper('a4', 'portrait');
+        ])->setPaper('a4', 'landscape');
 
         return $pdf->stream('reporte-mentorias.pdf');
     }
