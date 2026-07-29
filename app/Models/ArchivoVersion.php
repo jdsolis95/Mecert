@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class ArchivoVersion extends Model
 {
+    protected $table = 'archivo_versiones';
+
     protected $fillable = [
         'versionable_type',
         'versionable_id',
