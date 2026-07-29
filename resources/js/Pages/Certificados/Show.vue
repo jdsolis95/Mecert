@@ -6,6 +6,7 @@ const props = defineProps({
     certificado: Object,
     historiales: Array,
     examenes: Array,
+    versionesDocumento: Array,
     puedeEditar: Boolean,
 });
 
@@ -120,6 +121,28 @@ const estiloEstadoExamen = {
                         <p v-if="examen.comentario" class="text-sm text-gray-500 mt-1">
                             Comentario: {{ examen.comentario }}
                         </p>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white shadow rounded p-6">
+                <h2 class="text-lg font-semibold mb-4">Versiones del documento</h2>
+                <div v-if="versionesDocumento.length === 0" class="text-gray-400 text-sm">
+                    Sin versiones registradas.
+                </div>
+                <ul v-else class="space-y-3">
+                    <li v-for="(version, indice) in versionesDocumento" :key="version.id" class="border-t pt-3 first:border-t-0 first:pt-0 flex justify-between items-center">
+                        <div>
+                            <a :href="version.url" target="_blank" class="text-brand-darker hover:underline text-sm">
+                                {{ version.nombre_original }}
+                            </a>
+                            <p class="text-xs text-gray-500 mt-1">
+                                {{ version.subido_por ?? 'Carga inicial' }} — {{ version.fecha }}
+                            </p>
+                        </div>
+                        <span v-if="indice === 0" class="text-xs px-2 py-0.5 rounded bg-green-100 text-green-700 font-medium">
+                            Vigente
+                        </span>
                     </li>
                 </ul>
             </div>

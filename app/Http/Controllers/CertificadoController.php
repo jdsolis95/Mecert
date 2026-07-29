@@ -97,6 +97,10 @@ class CertificadoController extends Controller
                 ...$this->resolverDocumento($request),
             ]);
 
+            if ($certificado->documento_path) {
+                $certificado->registrarVersion('documento', $certificado->documento_path, $certificado->documento_nombre_original, $request->user()->id);
+            }
+
             $certificado->registrarAuditoria('creado', $request->user()->id, null, $certificado->snapshotAuditoria());
         });
 
@@ -113,6 +117,7 @@ class CertificadoController extends Controller
             'historiales.editadoPor:id,name,primer_apellido',
             'examenes.propuestoPor:id,name,primer_apellido',
             'examenes.decididoPor:id,name,primer_apellido',
+            'versionesArchivo.subidoPor:id,name,primer_apellido',
         ]);
 
         $user = $request->user();
@@ -137,6 +142,13 @@ class CertificadoController extends Controller
                 'editado_por' => trim($historial->editadoPor->name . ' ' . $historial->editadoPor->primer_apellido),
                 'datos_anteriores' => $historial->datos_anteriores,
                 'fecha' => $historial->created_at->format('d/m/Y H:i'),
+            ]),
+            'versionesDocumento' => $certificado->versionesArchivo->map(fn (\App\Models\ArchivoVersion $version) => [
+                'id' => $version->id,
+                'nombre_original' => $version->nombre_original,
+                'url' => Storage::url($version->path),
+                'subido_por' => $version->subidoPor ? trim($version->subidoPor->name . ' ' . $version->subidoPor->primer_apellido) : null,
+                'fecha' => $version->created_at->format('d/m/Y H:i'),
             ]),
             'examenes' => $certificado->examenes->map(fn (CertificadoExamen $examen) => [
                 'id' => $examen->id,
@@ -204,6 +216,8 @@ class CertificadoController extends Controller
 
             $certificado->registrarHistorial($request->user()->id);
 
+            $documentoNuevo = $this->resolverDocumento($request, $certificado);
+
             $certificado->update([
                 'colaborador_id' => $colaboradorId,
                 'tipo_certificado_id' => $request->tipo_certificado_id,
@@ -215,8 +229,12 @@ class CertificadoController extends Controller
                 // Si cambió la fecha de vencimiento, se reabre la ventana de avisos.
                 'notificado_amarillo_en' => null,
                 'notificado_rojo_en' => null,
-                ...$this->resolverDocumento($request, $certificado),
+                ...$documentoNuevo,
             ]);
+
+            if (! empty($documentoNuevo)) {
+                $certificado->registrarVersion('documento', $documentoNuevo['documento_path'], $documentoNuevo['documento_nombre_original'], $request->user()->id);
+            }
 
             $certificado->registrarAuditoria('modificado', $request->user()->id, $datosAnteriores, $certificado->snapshotAuditoria());
         });
@@ -388,13 +406,11 @@ class CertificadoController extends Controller
             ]);
     }
 
+    // No borra el documento anterior: cada carga queda como una versión nueva en el historial
+    // (ver Certificado::registrarVersion), para que el repositorio quede versionado y no se pierda el archivo previo.
     private function resolverDocumento(Request $request, ?Certificado $existente = null): array
     {
         if ($request->hasFile('documento_adjunto')) {
-            if ($existente?->documento_path) {
-                Storage::disk('public')->delete($existente->documento_path);
-            }
-
             $archivo = $request->file('documento_adjunto');
 
             return [

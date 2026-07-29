@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ArchivoVersion;
 use App\Models\Etiqueta;
 use App\Models\Mentoria;
 use App\Models\User;
@@ -80,6 +81,10 @@ class MentoriaController extends Controller
                 ...$this->resolverMultimedia($request),
             ]);
 
+            if ($request->hasFile('multimedia_archivo') && $mentoria->multimedia_path) {
+                $mentoria->registrarVersion('multimedia', $mentoria->multimedia_path, $mentoria->multimedia_nombre_original, $request->user()->id);
+            }
+
             $mentoria->etiquetas()->sync($request->input('etiquetas', []));
 
             $this->sincronizarEnlaces($mentoria, $request->input('enlaces', []));
@@ -92,7 +97,7 @@ class MentoriaController extends Controller
 
     public function show(Request $request, Mentoria $mentoria)
     {
-        $mentoria->load(['autor:id,name,primer_apellido', 'etiquetas:id,nombre', 'enlaces']);
+        $mentoria->load(['autor:id,name,primer_apellido', 'etiquetas:id,nombre', 'enlaces', 'versionesArchivo.subidoPor:id,name,primer_apellido']);
 
         return Inertia::render('Mentorias/Show', [
             'mentoria' => [
@@ -107,6 +112,13 @@ class MentoriaController extends Controller
                 'fecha_vencimiento' => $mentoria->fecha_vencimiento?->format('d/m/Y'),
                 'estado' => $mentoria->estado(),
             ],
+            'versionesMultimedia' => $mentoria->versionesArchivo->map(fn (ArchivoVersion $version) => [
+                'id' => $version->id,
+                'nombre_original' => $version->nombre_original,
+                'url' => Storage::url($version->path),
+                'subido_por' => $version->subidoPor ? trim($version->subidoPor->name . ' ' . $version->subidoPor->primer_apellido) : null,
+                'fecha' => $version->created_at->format('d/m/Y H:i'),
+            ]),
             'puedeEditar' => $request->user()->can('update', $mentoria),
         ]);
     }
@@ -160,6 +172,10 @@ class MentoriaController extends Controller
                 ...($cambioVigencia ? ['notificado_amarillo_en' => null, 'notificado_rojo_en' => null] : []),
                 ...$this->resolverMultimedia($request, $mentoria),
             ]);
+
+            if ($request->hasFile('multimedia_archivo') && $mentoria->multimedia_path) {
+                $mentoria->registrarVersion('multimedia', $mentoria->multimedia_path, $mentoria->multimedia_nombre_original, $request->user()->id);
+            }
 
             $mentoria->etiquetas()->sync($request->input('etiquetas', []));
 
@@ -292,16 +308,14 @@ class MentoriaController extends Controller
 
     // Aplica el archivo de multimedia según el tipo seleccionado y conserva
     // el archivo actual si no se sube uno nuevo (evita perderlo en una edición).
+    // No borra el archivo físico anterior: cada carga queda como una versión nueva en el historial
+    // (ver Mentoria::registrarVersion), para que el repositorio quede versionado.
     private function resolverMultimedia(Request $request, ?Mentoria $existente = null): array
     {
         $tipo = $request->input('multimedia_tipo') ?: null;
 
         if (in_array($tipo, ['imagen', 'documento', 'video'], true)) {
             if ($request->hasFile('multimedia_archivo')) {
-                if ($existente?->multimedia_path) {
-                    Storage::disk('public')->delete($existente->multimedia_path);
-                }
-
                 $archivo = $request->file('multimedia_archivo');
 
                 return [
@@ -327,10 +341,6 @@ class MentoriaController extends Controller
                 'multimedia_nombre_original' => null,
                 'multimedia_url' => null,
             ];
-        }
-
-        if ($existente?->multimedia_path) {
-            Storage::disk('public')->delete($existente->multimedia_path);
         }
 
         return [

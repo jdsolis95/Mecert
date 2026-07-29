@@ -4,6 +4,7 @@ import { Link, router } from '@inertiajs/vue3';
 
 const props = defineProps({
     mentoria: Object,
+    versionesMultimedia: Array,
     puedeEditar: Boolean,
 });
 
@@ -82,6 +83,24 @@ const etiquetaEstado = {
                                     class="text-brand-darker hover:underline text-sm">
                                     {{ enlace.texto || enlace.url }}
                                 </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div v-if="versionesMultimedia && versionesMultimedia.length" class="mb-6 border-t pt-4">
+                        <h2 class="text-sm font-medium text-gray-600 mb-2">Versiones del archivo multimedia</h2>
+                        <ul class="space-y-2">
+                            <li v-for="(version, indice) in versionesMultimedia" :key="version.id" class="flex justify-between items-center">
+                                <div>
+                                    <a :href="version.url" target="_blank" rel="noopener noreferrer"
+                                        class="text-brand-darker hover:underline text-sm">
+                                        {{ version.nombre_original }}
+                                    </a>
+                                    <p class="text-xs text-gray-400">{{ version.subido_por ?? 'Carga inicial' }} — {{ version.fecha }}</p>
+                                </div>
+                                <span v-if="indice === 0" class="text-xs px-2 py-0.5 rounded bg-green-100 text-green-700 font-medium">
+                                    Vigente
+                                </span>
                             </li>
                         </ul>
                     </div>
