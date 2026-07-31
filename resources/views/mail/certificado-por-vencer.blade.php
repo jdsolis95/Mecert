@@ -14,6 +14,9 @@
         <div style="background-color: #f9f9f9; border-left: 4px solid {{ $estado === 'rojo' ? '#e53935' : '#fbc02d' }}; padding: 15px; margin: 20px 0; border-radius: 4px;">
             <p style="margin: 0; color: #333;"><strong>Colaborador:</strong> {{ $certificado->colaborador->name }} {{ $certificado->colaborador->primer_apellido }}</p>
             <p style="margin: 10px 0 0 0; color: #333;"><strong>Tipo de certificado:</strong> {{ $certificado->tipoCertificacion->nombre }}</p>
+            <p style="margin: 10px 0 0 0; color: #333;"><strong>Nombre del certificado:</strong> {{ $certificado->nombre_certificado ?? '—' }}</p>
+            <p style="margin: 10px 0 0 0; color: #333;"><strong>Emisor:</strong> {{ $certificado->emisor ?? '—' }}</p>
+            <p style="margin: 10px 0 0 0; color: #333;"><strong>Código del certificado:</strong> {{ $certificado->codigo_certificado ?? '—' }}</p>
             <p style="margin: 10px 0 0 0; color: #333;"><strong>Fecha de vencimiento:</strong> {{ $certificado->fecha_vencimiento->format('d/m/Y') }}</p>
         </div>
 
