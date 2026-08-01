@@ -26,7 +26,7 @@ class CertificadoPolicy
 
     public function delete(User $user, Certificado $certificado): bool
     {
-        return $this->update($user, $certificado);
+        return $user->hasAnyRole(['Administrador', 'Controller']);
     }
 
     public function proponerExamen(User $user, Certificado $certificado): bool

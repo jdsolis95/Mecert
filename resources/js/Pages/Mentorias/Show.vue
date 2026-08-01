@@ -6,6 +6,7 @@ const props = defineProps({
     mentoria: Object,
     versionesMultimedia: Array,
     puedeEditar: Boolean,
+    puedeEliminar: Boolean,
 });
 
 function eliminar() {
@@ -105,12 +106,12 @@ const etiquetaEstado = {
                         </ul>
                     </div>
 
-                    <div v-if="puedeEditar" class="flex gap-3 pt-4 border-t">
-                        <Link :href="`/mentorias/${mentoria.id}/edit`"
+                    <div v-if="puedeEditar || puedeEliminar" class="flex gap-3 pt-4 border-t">
+                        <Link v-if="puedeEditar" :href="`/mentorias/${mentoria.id}/edit`"
                             class="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark">
                             Editar
                         </Link>
-                        <button @click="eliminar"
+                        <button v-if="puedeEliminar" @click="eliminar"
                             class="border border-red-300 text-red-600 px-4 py-2 rounded hover:bg-red-50">
                             Eliminar
                         </button>

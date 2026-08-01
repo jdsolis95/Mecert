@@ -120,6 +120,7 @@ class MentoriaController extends Controller
                 'fecha' => $version->created_at->format('d/m/Y H:i'),
             ]),
             'puedeEditar' => $request->user()->can('update', $mentoria),
+            'puedeEliminar' => $request->user()->can('delete', $mentoria),
         ]);
     }
 

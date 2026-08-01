@@ -14,6 +14,6 @@ class MentoriaPolicy
 
     public function delete(User $user, Mentoria $mentoria): bool
     {
-        return $this->update($user, $mentoria);
+        return $user->hasAnyRole(['Administrador', 'Controller']);
     }
 }
