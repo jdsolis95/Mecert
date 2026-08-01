@@ -21,6 +21,7 @@ const q = ref(props.filtros.q ?? '');
 const estado = ref(props.filtros.estado ?? '');
 let temporizador = null;
 
+// Pide el listado al backend con los filtros actuales, sin perder el scroll
 function buscar() {
     router.get('/certificados', { q: q.value, estado: estado.value }, {
         preserveState: true,
@@ -29,6 +30,7 @@ function buscar() {
     });
 }
 
+// Debounce de la búsqueda mientras el usuario escribe
 function alEscribir() {
     clearTimeout(temporizador);
     temporizador = setTimeout(buscar, 400);
@@ -46,6 +48,7 @@ const etiquetaEstado = {
     rojo: 'Vencido',
 };
 
+// Confirma antes de mandar la baja del certificado
 function eliminar(id) {
     if (confirm('¿Desea eliminar este certificado?')) {
         router.delete(`/certificados/${id}`);
@@ -56,6 +59,7 @@ const ordenColumna = ref(null);
 const ordenAscendente = ref(true);
 const rangoEstado = { rojo: 0, amarillo: 1, verde: 2 };
 
+// Cambia la columna de orden, o invierte la dirección si ya se estaba ordenando por esa misma
 function ordenarPor(columna) {
     if (ordenColumna.value === columna) {
         ordenAscendente.value = !ordenAscendente.value;
@@ -65,11 +69,13 @@ function ordenarPor(columna) {
     }
 }
 
+// Convierte dd/mm/aaaa a un número comparable para poder ordenar por fecha
 function fechaAOrden(fecha) {
     const [dia, mes, anio] = fecha.split('/');
     return Number(anio) * 10000 + Number(mes) * 100 + Number(dia);
 }
 
+// Ordena en el cliente sin volver a pedir el listado al servidor
 const certificadosOrdenados = computed(() => {
     if (!ordenColumna.value) {
         return props.certificados;
@@ -106,6 +112,7 @@ const formExamen = useForm({
     lugar_propuesto: '',
 });
 
+// Abre el modal de calendarizar examen para el certificado elegido
 function abrirModalExamen(certificado) {
     certificadoSeleccionado.value = certificado;
     formExamen.reset();
@@ -113,11 +120,13 @@ function abrirModalExamen(certificado) {
     mostrarModalExamen.value = true;
 }
 
+// Cierra el modal y limpia la selección
 function cerrarModalExamen() {
     mostrarModalExamen.value = false;
     certificadoSeleccionado.value = null;
 }
 
+// Envía la propuesta de fecha de examen para el certificado seleccionado
 function proponerExamen() {
     formExamen.post(`/certificados/${certificadoSeleccionado.value.id}/examenes`, {
         onSuccess: () => cerrarModalExamen(),
@@ -133,6 +142,7 @@ const reporteFiltros = ref({
     colaborador_id: '',
 });
 
+// Arma la URL del PDF solo con los filtros que tengan valor
 const urlReporte = computed(() => {
     const parametros = new URLSearchParams();
     Object.entries(reporteFiltros.value).forEach(([clave, valor]) => {

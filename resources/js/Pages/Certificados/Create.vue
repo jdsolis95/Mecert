@@ -19,10 +19,12 @@ const form = useForm({
     documento_adjunto: null,
 });
 
+// Toma el primer archivo elegido, o null si el usuario canceló la selección
 function alSeleccionarArchivo(evento) {
     form.documento_adjunto = evento.target.files[0] ?? null;
 }
 
+// Envía el formulario de alta
 function guardar() {
     form.post('/certificados');
 }

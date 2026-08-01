@@ -20,10 +20,12 @@ const form = useForm({
     documento_adjunto: null,
 });
 
+// Toma el primer archivo elegido, o null si el usuario canceló la selección
 function alSeleccionarArchivo(evento) {
     form.documento_adjunto = evento.target.files[0] ?? null;
 }
 
+// Envía como PUT vía spoofing, necesario porque el formulario lleva un archivo (multipart)
 function guardar() {
     form.transform((datos) => ({ ...datos, _method: 'put' })).post(`/certificados/${props.certificado.id}`);
 }

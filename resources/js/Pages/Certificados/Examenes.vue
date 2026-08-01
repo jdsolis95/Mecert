@@ -18,6 +18,7 @@ const form = useForm({
     comentario: '',
 });
 
+// Abre el modal de decisión precargado con la acción elegida (aprobar/rechazar)
 function abrirModal(examen, accion) {
     examenSeleccionado.value = examen;
     form.reset();
@@ -26,11 +27,13 @@ function abrirModal(examen, accion) {
     mostrarModal.value = true;
 }
 
+// Cierra el modal y limpia la selección
 function cerrarModal() {
     mostrarModal.value = false;
     examenSeleccionado.value = null;
 }
 
+// Envía la decisión (aprobar/rechazar) como PATCH vía spoofing
 function decidir() {
     form
         .transform((datos) => ({ ...datos, _method: 'patch' }))
