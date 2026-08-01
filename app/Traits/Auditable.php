@@ -12,6 +12,7 @@ trait Auditable
         return $this->morphMany(Auditoria::class, 'auditable')->latest();
     }
 
+    // Deja constancia en la bitácora de auditoría del modelo (creado/modificado/eliminado)
     public function registrarAuditoria(string $accion, int $usuarioId, ?array $datosAnteriores = null, ?array $datosNuevos = null): void
     {
         $this->auditorias()->create([

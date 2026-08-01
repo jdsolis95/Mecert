@@ -98,11 +98,13 @@ class Certificado extends Model
         return $vencimiento->lte($umbral) ? 'amarillo' : 'verde';
     }
 
+    // Negativo si el certificado ya venció
     public function diasRestantes(): int
     {
         return Carbon::today()->diffInDays(Carbon::parse($this->fecha_vencimiento), false);
     }
 
+    // Estado actual del certificado para guardar en la bitácora de auditoría
     public function snapshotAuditoria(): array
     {
         return [
