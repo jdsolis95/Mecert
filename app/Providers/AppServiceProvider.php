@@ -17,9 +17,7 @@ class AppServiceProvider extends ServiceProvider
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
+    // Precarga los assets de Vite y registra el comando artisan para forzar el cambio de contraseña
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
@@ -28,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
         // por convencion (metodo handle() tipado a Login/Logout) — no requieren
         // registro manual con Event::listen(), eso causaba doble ejecucion.
 
-        // Register a small artisan helper to force the must_change_password flag
+        // Comando para forzar el flag must_change_password a un usuario puntual o a todos
         Artisan::command('user:force-change {email?} {--all}', function ($email = null) {
             $all = $this->option('all');
 

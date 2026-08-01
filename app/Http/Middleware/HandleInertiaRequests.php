@@ -22,11 +22,7 @@ class HandleInertiaRequests extends Middleware
         return parent::version($request);
     }
 
-    /**
-     * Define the props that are shared by default.
-     *
-     * @return array<string, mixed>
-     */
+    // Props que Inertia comparte en cada página: usuario, su rol y sus permisos por módulo para armar el menú
     public function share(Request $request): array
     {
         return [

@@ -8,9 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsurePasswordIsChanged
 {
-    /**
-     * Handle an incoming request.
-     */
+    // Si el usuario tiene pendiente el cambio de contraseña, lo manda a esa pantalla sin importar a dónde iba
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();

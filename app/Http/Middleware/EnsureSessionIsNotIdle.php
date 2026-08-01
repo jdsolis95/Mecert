@@ -11,6 +11,7 @@ class EnsureSessionIsNotIdle
 {
     private const MINUTOS_INACTIVIDAD = 20;
 
+    // Cierra la sesión si pasaron 20 minutos sin actividad; si no, actualiza la marca de tiempo
     public function handle(Request $request, Closure $next): Response
     {
         $usuario = $request->user();

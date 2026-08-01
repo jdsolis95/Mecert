@@ -35,11 +35,7 @@ class LoginRequest extends FormRequest
         ];
     }
 
-    /**
-     * Attempt to authenticate the request's credentials.
-     *
-     * @throws ValidationException
-     */
+    // Valida credenciales y bloquea el login si la cuenta está desactivada
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();

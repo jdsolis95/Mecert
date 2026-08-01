@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureUserIsActive
 {
+    // Si al usuario ya logueado lo desactivaron, se le cierra la sesión en la siguiente petición
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
