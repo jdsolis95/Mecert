@@ -104,6 +104,7 @@ class Mentoria extends Model
         return $vencimiento->lte($umbral) ? 'amarillo' : 'verde';
     }
 
+    // Null si no tiene vigencia definida, negativo si ya venció
     public function diasRestantes(): ?int
     {
         if (! $this->fecha_vencimiento) {
