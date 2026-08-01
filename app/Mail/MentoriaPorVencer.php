@@ -18,6 +18,7 @@ class MentoriaPorVencer extends Mailable
         public string $estado,
     ) {}
 
+    // El asunto cambia según si la mentoría ya venció o solo está por vencer
     public function envelope(): Envelope
     {
         $asunto = $this->estado === 'rojo'
@@ -27,6 +28,7 @@ class MentoriaPorVencer extends Mailable
         return new Envelope(subject: $asunto);
     }
 
+    // Vista con el detalle de la mentoría y su estado de vigencia
     public function content(): Content
     {
         return new Content(

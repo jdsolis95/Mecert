@@ -16,6 +16,7 @@ class CerrarAccesosAbandonados extends Command
     // Mismo umbral de inactividad que EnsureSessionIsNotIdle, para ser consistentes con esa regla.
     private const MINUTOS_INACTIVIDAD = 20;
 
+    // Si la última actividad de sesión superó el umbral, marca la salida con esa fecha (o con el ingreso si no hay actividad)
     public function handle(): int
     {
         $umbral = now()->subMinutes(self::MINUTOS_INACTIVIDAD);

@@ -13,6 +13,7 @@ class EliminarCertificadosVencidos extends Command
 
     protected $description = 'Elimina (soft-delete) los certificados vencidos hace más de los días de gracia definidos';
 
+    // Da de baja automáticamente los certificados vencidos hace más de los días de gracia, atribuyendo la baja al Administrador
     public function handle(): void
     {
         $administrador = User::role('Administrador')->first();

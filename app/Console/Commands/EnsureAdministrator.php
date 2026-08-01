@@ -18,6 +18,7 @@ class EnsureAdministrator extends Command
 
     protected $description = 'Crea o recupera de forma segura el usuario administrador del sistema';
 
+    // Crea el usuario Administrador si no existe, o lo recupera y opcionalmente le resetea la contraseña
     public function handle(): int
     {
         $email = Str::lower((string) ($this->option('email') ?: env('ADMIN_EMAIL', 'administrator@datacr.com')));

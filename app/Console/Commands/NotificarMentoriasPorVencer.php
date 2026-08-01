@@ -14,6 +14,7 @@ class NotificarMentoriasPorVencer extends Command
 
     protected $description = 'Envía un correo único al autor (con copia a Controller) cuando una mentoría con vigencia entra en amarillo o en rojo';
 
+    // Recorre las mentorías con vigencia y avisa una sola vez por cada umbral (amarillo/rojo) que cruzan
     public function handle(): void
     {
         $controllers = User::role('Controller')->pluck('email')->all();

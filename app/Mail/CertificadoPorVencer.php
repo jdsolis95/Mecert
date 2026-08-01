@@ -19,6 +19,7 @@ class CertificadoPorVencer extends Mailable
         public string $estado,
     ) {}
 
+    // El asunto cambia según si el certificado ya venció o solo está por vencer
     public function envelope(): Envelope
     {
         $asunto = $this->estado === 'rojo'
@@ -28,6 +29,7 @@ class CertificadoPorVencer extends Mailable
         return new Envelope(subject: $asunto);
     }
 
+    // Vista con el detalle del certificado y su estado de vigencia
     public function content(): Content
     {
         return new Content(

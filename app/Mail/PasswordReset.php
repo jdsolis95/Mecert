@@ -19,6 +19,7 @@ class PasswordReset extends Mailable
         public string $temporaryPassword
     ) {}
 
+    // Asunto fijo, se manda cuando un admin resetea la contraseña de un usuario
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -26,6 +27,7 @@ class PasswordReset extends Mailable
         );
     }
 
+    // Vista con la contraseña temporal generada
     public function content(): Content
     {
         return new Content(

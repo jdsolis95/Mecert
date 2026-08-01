@@ -14,6 +14,7 @@ class NotificarExamenesProximos extends Command
 
     protected $description = 'Envía un recordatorio al colaborador 5 días antes de la fecha de un examen de certificación aprobado';
 
+    // Busca los exámenes aprobados que caen exactamente 5 días adelante y manda el recordatorio una sola vez
     public function handle(): void
     {
         $fechaObjetivo = Carbon::today()->addDays(5);

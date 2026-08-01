@@ -19,6 +19,7 @@ class AccesoController extends Controller
         'fecha_salida' => 'accesos.fecha_salida',
     ];
 
+    // Bitácora de accesos con filtros por usuario/fecha y orden configurable por columna
     public function index(Request $request)
     {
         $usuarioId = $request->input('usuario_id');
@@ -64,6 +65,7 @@ class AccesoController extends Controller
         ]);
     }
 
+    // Arma el PDF de la bitácora de accesos con los mismos filtros del listado
     public function reportePdf(Request $request)
     {
         $usuarioId = $request->input('usuario_id');

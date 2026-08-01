@@ -10,6 +10,7 @@ class AyudaController extends Controller
 {
     private const RUTA_MANUAL = 'manual/manual_mecert.pdf';
 
+    // Muestra la pantalla de ayuda con el manual actual, si existe
     public function index(Request $request)
     {
         $manualExiste = Storage::disk('public')->exists(self::RUTA_MANUAL);
@@ -26,6 +27,7 @@ class AyudaController extends Controller
         ]);
     }
 
+    // Sirve el PDF del manual embebido en el iframe de la pantalla de ayuda
     public function manual()
     {
         abort_unless(Storage::disk('public')->exists(self::RUTA_MANUAL), 404, 'Manual no encontrado.');
@@ -36,6 +38,7 @@ class AyudaController extends Controller
         ]);
     }
 
+    // Reemplaza el manual PDF publicado (siempre con el mismo nombre de archivo)
     public function subirManual(Request $request)
     {
         $request->validate([

@@ -17,11 +17,13 @@ class CertificadoExamenRecordatorio extends Mailable
         public CertificadoExamen $examen,
     ) {}
 
+    // Asunto fijo, se manda 5 días antes de la fecha del examen aprobado
     public function envelope(): Envelope
     {
         return new Envelope(subject: 'Recordatorio: examen de certificación próximo - MeCert');
     }
 
+    // Vista con la fecha y el lugar del examen ya aprobado
     public function content(): Content
     {
         return new Content(

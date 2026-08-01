@@ -27,6 +27,7 @@ class AuditoriaController extends Controller
         'usuario' => 'users.primer_apellido',
     ];
 
+    // Bitácora de movimientos (creado/modificado/eliminado) con filtros y orden configurable por columna
     public function index(Request $request)
     {
         $accion = $request->input('accion');
@@ -84,6 +85,7 @@ class AuditoriaController extends Controller
         ]);
     }
 
+    // Arma el PDF de la bitácora de movimientos con los mismos filtros del listado
     public function reportePdf(Request $request)
     {
         $accion = $request->input('accion');
@@ -136,6 +138,7 @@ class AuditoriaController extends Controller
         return $pdf->stream('reporte-bitacora-movimientos.pdf');
     }
 
+    // El auditable_type guarda el FQCN del modelo; para mostrar solo se necesita el nombre corto
     private function nombreModulo(string $auditableType): string
     {
         return class_basename($auditableType);
