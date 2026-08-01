@@ -33,6 +33,7 @@ class EtiquetaController extends Controller
         ]);
     }
 
+    // Formulario de alta de etiqueta
     public function create()
     {
         return Inertia::render('Etiquetas/Form', [
@@ -40,6 +41,7 @@ class EtiquetaController extends Controller
         ]);
     }
 
+    // Guarda la etiqueta nueva, activa por defecto
     public function store(Request $request)
     {
         $data = $request->validate($this->reglas());
@@ -50,6 +52,7 @@ class EtiquetaController extends Controller
             ->with('mensaje', 'Etiqueta creada correctamente.');
     }
 
+    // Formulario de edición de la etiqueta
     public function edit(Etiqueta $etiqueta)
     {
         return Inertia::render('Etiquetas/Form', [
@@ -57,6 +60,7 @@ class EtiquetaController extends Controller
         ]);
     }
 
+    // Actualiza el nombre de la etiqueta
     public function update(Request $request, Etiqueta $etiqueta)
     {
         $data = $request->validate($this->reglas($etiqueta));
@@ -90,6 +94,7 @@ class EtiquetaController extends Controller
         return back()->with('mensaje', $etiqueta->activo ? 'Etiqueta habilitada.' : 'Etiqueta deshabilitada.');
     }
 
+    // Valida que el nombre no se repita entre etiquetas
     private function reglas(?Etiqueta $etiqueta = null): array
     {
         return [

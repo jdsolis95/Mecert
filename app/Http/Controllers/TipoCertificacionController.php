@@ -33,6 +33,7 @@ class TipoCertificacionController extends Controller
         ]);
     }
 
+    // Formulario de alta de tipo de certificación
     public function create()
     {
         return Inertia::render('TiposCertificacion/Form', [
@@ -40,6 +41,7 @@ class TipoCertificacionController extends Controller
         ]);
     }
 
+    // Guarda el tipo nuevo, activo por defecto
     public function store(Request $request)
     {
         $data = $request->validate($this->reglas());
@@ -50,6 +52,7 @@ class TipoCertificacionController extends Controller
             ->with('mensaje', 'Tipo de certificación creado correctamente.');
     }
 
+    // Formulario de edición del tipo de certificación
     public function edit(TipoCertificacion $tipo_certificacion)
     {
         return Inertia::render('TiposCertificacion/Form', [
@@ -57,6 +60,7 @@ class TipoCertificacionController extends Controller
         ]);
     }
 
+    // Actualiza el nombre del tipo de certificación
     public function update(Request $request, TipoCertificacion $tipo_certificacion)
     {
         $data = $request->validate($this->reglas($tipo_certificacion));
@@ -90,6 +94,7 @@ class TipoCertificacionController extends Controller
         return back()->with('mensaje', $tipo_certificacion->activo ? 'Tipo habilitado.' : 'Tipo deshabilitado.');
     }
 
+    // Valida que el nombre no se repita entre tipos de certificación
     private function reglas(?TipoCertificacion $tipo = null): array
     {
         return [
