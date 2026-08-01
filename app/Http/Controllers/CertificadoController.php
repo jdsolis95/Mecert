@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CertificadoExamenDecidido;
+use App\Mail\CertificadoExamenPropuesto;
 use App\Mail\CertificadoPorVencer;
 use App\Models\Certificado;
 use App\Models\CertificadoExamen;
@@ -12,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -264,12 +267,15 @@ class CertificadoController extends Controller
             'lugar_propuesto' => ['nullable', 'string', 'max:150'],
         ]);
 
-        $certificado->examenes()->create([
+        $examen = $certificado->examenes()->create([
             'fecha_propuesta' => $request->fecha_propuesta,
             'lugar_propuesto' => $request->lugar_propuesto,
             'propuesto_por_id' => $request->user()->id,
             'estado' => 'pendiente',
         ]);
+
+        $controllers = User::role('Controller')->pluck('email')->all();
+        Mail::to($certificado->colaborador->email)->cc($controllers)->send(new CertificadoExamenPropuesto($examen));
 
         return back()->with('mensaje', 'Examen de renovación calendarizado, queda pendiente de aprobación.');
     }
@@ -322,6 +328,9 @@ class CertificadoController extends Controller
             // Reabre la ventana del recordatorio si se (re)aprueba con una nueva fecha de examen.
             'notificado_recordatorio_en' => null,
         ]);
+
+        $controllers = User::role('Controller')->pluck('email')->all();
+        Mail::to($examen->certificado->colaborador->email)->cc($controllers)->send(new CertificadoExamenDecidido($examen));
 
         return back()->with('mensaje', $request->accion === 'aprobar' ? 'Examen aprobado.' : 'Examen rechazado.');
     }
