@@ -109,6 +109,7 @@ class RoleController extends Controller
             ->with('mensaje', 'Rol eliminado correctamente.');
     }
 
+    // Valida nombre y permisos; los roles base no permiten cambiar el nombre
     private function rolRules(Request $request, ?Role $role = null, bool $esRolBase = false): array
     {
         $rules = [

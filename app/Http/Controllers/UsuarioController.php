@@ -157,6 +157,7 @@ class UsuarioController extends Controller
             ->with('mensaje', "Contraseña temporal enviada a {$usuario->email}");
     }
 
+    // Reglas del formulario; la contraseña solo es obligatoria al crear, no al editar
     private function usuarioRules(?User $usuario = null): array
     {
         $userId = $usuario?->id;

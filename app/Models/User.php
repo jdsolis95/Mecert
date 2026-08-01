@@ -70,6 +70,7 @@ class User extends Authenticatable
         return $this->hasMany(Certificado::class, 'colaborador_id');
     }
 
+    // Compara contra la contraseña actual y las últimas N del historial, para no permitir repetirlas
     public function passwordMatchesCurrentOrRecent(string $plainPassword, int $recentHistoryCount = 2): bool
     {
         if (Hash::check($plainPassword, $this->password)) {
@@ -90,6 +91,7 @@ class User extends Authenticatable
         return false;
     }
 
+    // Guarda la contraseña vigente en el historial y solo conserva las últimas 2
     public function archiveCurrentPassword(): void
     {
         $this->passwordHistories()->create([
