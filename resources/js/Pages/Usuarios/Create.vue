@@ -18,6 +18,7 @@ const form = useForm({
     rol: '',
 });
 
+// Envía el formulario de alta de usuario
 function guardar() {
     form.post('/usuarios');
 }

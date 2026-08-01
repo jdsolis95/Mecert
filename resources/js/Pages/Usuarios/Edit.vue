@@ -17,6 +17,7 @@ const form = useForm({
     esta_activo: props.usuario.esta_activo,
 });
 
+// Envía los cambios del usuario
 function actualizar() {
     form.put(`/usuarios/${props.usuario.id}`);
 }

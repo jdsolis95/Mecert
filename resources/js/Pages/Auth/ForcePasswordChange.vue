@@ -12,6 +12,7 @@ const form = useForm({
     password_confirmation: '',
 });
 
+// Envía la nueva contraseña; al terminar limpia los campos sensibles del formulario
 const submit = () => {
     form.put(route('password.update'), {
         preserveScroll: true,

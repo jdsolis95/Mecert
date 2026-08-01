@@ -7,6 +7,7 @@ defineProps({
     roles: Array,
 });
 
+// Confirma antes de eliminar; el backend igual bloquea roles base o con usuarios asignados
 function eliminar(rol) {
     if (!confirm(`¿Desea eliminar el rol "${rol.nombre}"?`)) {
         return;

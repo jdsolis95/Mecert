@@ -17,6 +17,7 @@ const form = useForm({
     permisos: [...props.permisosAsignados],
 });
 
+// Mismo formulario para crear y editar; decide el verbo/endpoint según si ya existe el rol
 function guardar() {
     if (esEdicion.value) {
         form.put(`/roles/${props.rol.id}`);

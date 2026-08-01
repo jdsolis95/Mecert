@@ -16,8 +16,10 @@ const busqueda = ref('');
 const filtroRol = ref(new URLSearchParams(window.location.search).get('rol') ?? '');
 const filtroEstado = ref('');
 
+// Roles distintos presentes en el listado, para armar el select de filtro
 const rolesDisponibles = computed(() => [...new Set(props.usuarios.map((u) => u.rol))].sort());
 
+// Filtra en el cliente por texto (nombre/cédula), rol y estado sin volver a pedir el listado
 const usuariosFiltrados = computed(() => {
     const termino = busqueda.value.trim().toLowerCase();
 
@@ -33,6 +35,7 @@ const usuariosFiltrados = computed(() => {
     });
 });
 
+// Confirma antes de habilitar/deshabilitar según el estado actual del usuario
 function alternarEstado(usuario) {
     const accion = usuario.esta_activo ? 'deshabilitar' : 'habilitar';
     if (confirm(`¿Desea ${accion} este usuario?`)) {
@@ -40,6 +43,7 @@ function alternarEstado(usuario) {
     }
 }
 
+// Confirma y dispara el envío de la contraseña temporal por correo
 function resetPassword(usuario) {
     if (confirm(`¿Enviar reset de contraseña a ${usuario.email}?`)) {
         router.post(`/usuarios/${usuario.id}/reset-password`, {}, {
