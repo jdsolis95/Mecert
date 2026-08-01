@@ -9,6 +9,7 @@ const props = defineProps({
     puedeEliminar: Boolean,
 });
 
+// Pide confirmación antes de mandar el delete, ya que es irreversible
 function eliminar() {
     if (confirm('¿Desea eliminar esta mentoría? Esta acción no se puede deshacer.')) {
         router.delete(`/mentorias/${props.mentoria.id}`);

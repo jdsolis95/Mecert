@@ -18,6 +18,7 @@ use Inertia\Inertia;
 
 class MentoriaController extends Controller
 {
+    // Listado de mentorías con filtros de búsqueda, etiquetas y vigencia
     public function index(Request $request)
     {
         $etiquetaIds = collect($request->input('etiquetas', []))
@@ -61,6 +62,7 @@ class MentoriaController extends Controller
         ]);
     }
 
+    // Formulario de alta con las etiquetas activas disponibles
     public function create()
     {
         return Inertia::render('Mentorias/Create', [
@@ -68,6 +70,7 @@ class MentoriaController extends Controller
         ]);
     }
 
+    // Guarda la mentoría, sincroniza etiquetas/enlaces y sube la primera versión del multimedia
     public function store(Request $request)
     {
         $request->validate($this->mentoriaRules($request), $this->mentoriaMessages($request));
@@ -95,6 +98,7 @@ class MentoriaController extends Controller
         return redirect()->route('mentorias.index')->with('mensaje', 'Publicación creada correctamente.');
     }
 
+    // Detalle de la mentoría con sus enlaces y versiones de archivo
     public function show(Request $request, Mentoria $mentoria)
     {
         $mentoria->load(['autor:id,name,primer_apellido', 'etiquetas:id,nombre', 'enlaces', 'versionesArchivo.subidoPor:id,name,primer_apellido']);
@@ -124,6 +128,7 @@ class MentoriaController extends Controller
         ]);
     }
 
+    // Formulario de edición con los datos actuales de la mentoría
     public function edit(Mentoria $mentoria)
     {
         Gate::authorize('update', $mentoria);
@@ -151,6 +156,7 @@ class MentoriaController extends Controller
         ]);
     }
 
+    // Actualiza la mentoría y reabre los avisos de vigencia si cambia la fecha de vencimiento
     public function update(Request $request, Mentoria $mentoria)
     {
         Gate::authorize('update', $mentoria);
@@ -189,6 +195,7 @@ class MentoriaController extends Controller
         return redirect()->route('mentorias.index')->with('mensaje', 'Publicación actualizada correctamente.');
     }
 
+    // Baja lógica de la mentoría, dejando registro de quién la hizo
     public function destroy(Request $request, Mentoria $mentoria)
     {
         Gate::authorize('delete', $mentoria);
@@ -202,6 +209,7 @@ class MentoriaController extends Controller
         return redirect()->route('mentorias.index')->with('mensaje', 'Publicación eliminada correctamente.');
     }
 
+    // Arma el PDF de mentorías con los filtros aplicados
     public function reportePdf(Request $request)
     {
         $desde = $request->input('desde');
@@ -262,6 +270,7 @@ class MentoriaController extends Controller
         return $pdf->stream('reporte-mentorias.pdf');
     }
 
+    // Recrea los enlaces externos de la mentoría a partir de lo enviado en el formulario
     private function sincronizarEnlaces(Mentoria $mentoria, array $enlaces): void
     {
         foreach ($enlaces as $enlace) {
@@ -272,11 +281,13 @@ class MentoriaController extends Controller
         }
     }
 
+    // Nombre completo del autor para mostrar en listado/detalle
     private function nombreAutor(Mentoria $mentoria): string
     {
         return trim($mentoria->autor->name . ' ' . $mentoria->autor->primer_apellido);
     }
 
+    // Arma la fila del listado de mentorías
     private function mapaListado(Mentoria $mentoria): array
     {
         return [
@@ -292,6 +303,7 @@ class MentoriaController extends Controller
         ];
     }
 
+    // Arma los datos del multimedia para el front, o null si la mentoría no tiene
     private function mapaMultimedia(Mentoria $mentoria): ?array
     {
         if (! $mentoria->multimedia_tipo) {
@@ -352,6 +364,7 @@ class MentoriaController extends Controller
         ];
     }
 
+    // Reglas del formulario, valida etiqueta activa/asignada y el archivo según el tipo de multimedia elegido
     private function mentoriaRules(Request $request, ?Mentoria $mentoria = null): array
     {
         $tipo = $request->input('multimedia_tipo');
@@ -395,6 +408,7 @@ class MentoriaController extends Controller
         ];
     }
 
+    // Mensajes de validación personalizados según el tipo de multimedia elegido
     private function mentoriaMessages(Request $request): array
     {
         return [

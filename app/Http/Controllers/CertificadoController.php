@@ -21,6 +21,7 @@ use Inertia\Inertia;
 
 class CertificadoController extends Controller
 {
+    // Colaborador ve solo sus certificados, admin/controller ven todos y pueden filtrar por estado
     public function index(Request $request)
     {
         $user = $request->user();
@@ -62,6 +63,7 @@ class CertificadoController extends Controller
         ]);
     }
 
+    // Formulario de alta: si no es gestor, el colaborador queda fijo en el propio usuario
     public function create(Request $request)
     {
         Gate::authorize('create', Certificado::class);
@@ -79,6 +81,7 @@ class CertificadoController extends Controller
         ]);
     }
 
+    // Guarda el certificado y deja la primera versión del documento en el historial
     public function store(Request $request)
     {
         Gate::authorize('create', Certificado::class);
@@ -110,6 +113,7 @@ class CertificadoController extends Controller
         return redirect()->route('certificados.index')->with('mensaje', 'Certificado creado correctamente.');
     }
 
+    // Detalle del certificado con historial, exámenes y versiones de documento cargados
     public function show(Request $request, Certificado $certificado)
     {
         Gate::authorize('view', $certificado);
@@ -168,6 +172,7 @@ class CertificadoController extends Controller
         ]);
     }
 
+    // Formulario de edición, igual que create pero con los datos ya cargados
     public function edit(Request $request, Certificado $certificado)
     {
         Gate::authorize('update', $certificado);
@@ -203,6 +208,7 @@ class CertificadoController extends Controller
         ]);
     }
 
+    // Actualiza el certificado, guarda el historial anterior y reabre los avisos si cambia la vigencia
     public function update(Request $request, Certificado $certificado)
     {
         Gate::authorize('update', $certificado);
@@ -245,6 +251,7 @@ class CertificadoController extends Controller
         return redirect()->route('certificados.index')->with('mensaje', 'Certificado actualizado correctamente.');
     }
 
+    // Baja lógica del certificado, dejando registro de quién la hizo
     public function destroy(Request $request, Certificado $certificado)
     {
         Gate::authorize('delete', $certificado);
@@ -258,6 +265,7 @@ class CertificadoController extends Controller
         return redirect()->route('certificados.index')->with('mensaje', 'Certificado eliminado correctamente.');
     }
 
+    // Calendariza el examen de renovación y avisa por correo al colaborador con copia a Control
     public function proponerExamen(Request $request, Certificado $certificado)
     {
         Gate::authorize('proponerExamen', $certificado);
@@ -280,6 +288,7 @@ class CertificadoController extends Controller
         return back()->with('mensaje', 'Examen de renovación calendarizado, queda pendiente de aprobación.');
     }
 
+    // Bandeja de exámenes en espera de aprobación para Control/Admin
     public function examenesPendientes()
     {
         Gate::authorize('aprobarExamen', Certificado::class);
@@ -307,6 +316,7 @@ class CertificadoController extends Controller
         ]);
     }
 
+    // Aprueba o rechaza el examen propuesto y notifica la decisión al colaborador
     public function decidirExamen(Request $request, CertificadoExamen $examen)
     {
         Gate::authorize('aprobarExamen', Certificado::class);
@@ -335,6 +345,7 @@ class CertificadoController extends Controller
         return back()->with('mensaje', $request->accion === 'aprobar' ? 'Examen aprobado.' : 'Examen rechazado.');
     }
 
+    // Arma el PDF de certificados con los filtros aplicados
     public function reportePdf(Request $request)
     {
         $desde = $request->input('desde');
@@ -393,6 +404,7 @@ class CertificadoController extends Controller
         return $pdf->stream('reporte-certificados.pdf');
     }
 
+    // Si quien hace la petición no es gestor, el certificado se asigna a él mismo
     private function resolverColaboradorId(Request $request): int
     {
         $user = $request->user();
@@ -404,6 +416,7 @@ class CertificadoController extends Controller
         return (int) $request->input('colaborador_id');
     }
 
+    // Colaboradores activos para los selects de los formularios
     private function colaboradoresParaSelect()
     {
         return User::where('esta_activo', true)
@@ -431,6 +444,7 @@ class CertificadoController extends Controller
         return [];
     }
 
+    // Arma la fila del listado ya con los permisos resueltos para el front
     private function mapaListado(Certificado $certificado, User $user): array
     {
         return [
@@ -451,6 +465,7 @@ class CertificadoController extends Controller
         ];
     }
 
+    // Reglas del formulario, valida que no se repita el tipo de certificado por colaborador
     private function certificadoRules(Request $request, int $colaboradorId, ?Certificado $certificado = null): array
     {
         return [

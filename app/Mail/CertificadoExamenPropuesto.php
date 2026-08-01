@@ -17,11 +17,13 @@ class CertificadoExamenPropuesto extends Mailable
         public CertificadoExamen $examen,
     ) {}
 
+    // Asunto fijo, se manda apenas queda registrada la propuesta
     public function envelope(): Envelope
     {
         return new Envelope(subject: 'Examen de renovación propuesto - MeCert');
     }
 
+    // Vista con los datos de la fecha/lugar propuesto
     public function content(): Content
     {
         return new Content(

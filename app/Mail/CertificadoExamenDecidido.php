@@ -17,6 +17,7 @@ class CertificadoExamenDecidido extends Mailable
         public CertificadoExamen $examen,
     ) {}
 
+    // El asunto cambia según si el examen quedó aprobado o rechazado
     public function envelope(): Envelope
     {
         $asunto = $this->examen->estado === 'aprobado'
@@ -26,6 +27,7 @@ class CertificadoExamenDecidido extends Mailable
         return new Envelope(subject: $asunto);
     }
 
+    // Vista con el detalle de la decisión tomada
     public function content(): Content
     {
         return new Content(
