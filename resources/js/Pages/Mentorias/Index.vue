@@ -40,6 +40,7 @@ const vistas = [
 //variable modos de vista
 const modoVista = ref(localStorage.getItem('mentorias_vista') ?? 'grande');
 
+// Cambia el modo de vista y lo recuerda para la próxima visita
 function cambiarVista(valor) {
     modoVista.value = valor;
     localStorage.setItem('mentorias_vista', valor);
@@ -50,6 +51,7 @@ const seleccionadas = ref([...(props.filtros.etiquetas ?? [])]);
 const estado = ref(props.filtros.estado ?? '');
 let temporizador = null;
 
+// Pide el listado al backend con los filtros actuales, sin perder el scroll
 function buscar() {
     router.get('/mentorias', { q: q.value, etiquetas: seleccionadas.value, estado: estado.value }, {
         preserveState: true,
@@ -58,6 +60,7 @@ function buscar() {
     });
 }
 
+// Debounce de la búsqueda mientras el usuario escribe
 function alEscribir() {
     clearTimeout(temporizador);
     temporizador = setTimeout(buscar, 400);
@@ -83,6 +86,7 @@ const reporteFiltros = ref({
     etiqueta_id: '',
 });
 
+// Arma la URL del PDF solo con los filtros que tengan valor
 const urlReporte = computed(() => {
     const parametros = new URLSearchParams();
     Object.entries(reporteFiltros.value).forEach(([clave, valor]) => {

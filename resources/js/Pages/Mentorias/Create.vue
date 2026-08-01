@@ -16,18 +16,22 @@ const form = useForm({
     fecha_vencimiento: '',
 });
 
+// Toma el primer archivo elegido, o null si el usuario canceló la selección
 function alSeleccionarArchivo(evento) {
     form.multimedia_archivo = evento.target.files[0] ?? null;
 }
 
+// Agrega una fila vacía de enlace externo al formulario
 function agregarEnlace() {
     form.enlaces.push({ url: '', texto: '' });
 }
 
+// Quita el enlace en esa posición de la lista
 function quitarEnlace(indice) {
     form.enlaces.splice(indice, 1);
 }
 
+// Envía el formulario de alta
 function guardar() {
     form.post('/mentorias');
 }
