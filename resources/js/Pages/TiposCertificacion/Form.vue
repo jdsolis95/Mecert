@@ -13,6 +13,7 @@ const form = useForm({
     nombre: props.tipo?.nombre ?? '',
 });
 
+// Mismo formulario para crear y editar; decide el verbo/endpoint según si ya existe el tipo
 function guardar() {
     if (esEdicion.value) {
         form.put(`/tipos-certificacion/${props.tipo.id}`);

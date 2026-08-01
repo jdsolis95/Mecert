@@ -34,6 +34,7 @@ const estiloAccion = {
     eliminado: 'bg-red-50 text-red-700',
 };
 
+// Pide el listado al backend manteniendo el orden actual
 function filtrar() {
     router.get('/bitacoras', {
         accion: accion.value,
@@ -50,6 +51,7 @@ function filtrar() {
     });
 }
 
+// Pide al backend ordenar por esa columna, invirtiendo la dirección si ya se estaba usando
 function ordenarPor(columna) {
     const direccion = (props.filtros.orden === columna && props.filtros.direccion === 'asc') ? 'desc' : 'asc';
 
@@ -68,6 +70,7 @@ function ordenarPor(columna) {
     });
 }
 
+// Expande el detalle de esa fila, o lo colapsa si ya estaba abierta
 function alternarDetalle(id) {
     expandido.value = expandido.value === id ? null : id;
 }
@@ -81,6 +84,7 @@ const reporteFiltros = ref({
     usuario_id: '',
 });
 
+// Arma la URL del PDF solo con los filtros que tengan valor
 const urlReporte = computed(() => {
     const parametros = new URLSearchParams();
     Object.entries(reporteFiltros.value).forEach(([clave, valor]) => {

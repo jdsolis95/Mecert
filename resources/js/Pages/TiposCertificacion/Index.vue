@@ -12,6 +12,7 @@ const props = defineProps({
 const q = ref(props.filtros.q ?? '');
 let temporizador = null;
 
+// Pide el listado al backend con el texto de búsqueda actual
 function buscar() {
     router.get('/tipos-certificacion', { q: q.value }, {
         preserveState: true,
@@ -20,11 +21,13 @@ function buscar() {
     });
 }
 
+// Debounce de la búsqueda mientras el usuario escribe
 function alEscribir() {
     clearTimeout(temporizador);
     temporizador = setTimeout(buscar, 400);
 }
 
+// Confirma antes de eliminar; el backend igual bloquea si el tipo está en uso
 function eliminar(tipo) {
     if (!confirm(`¿Desea eliminar el tipo de certificación "${tipo.nombre}"?`)) {
         return;
@@ -39,6 +42,7 @@ function eliminar(tipo) {
     });
 }
 
+// Cambia activo/inactivo sin salir del listado
 function alternar(tipo) {
     router.patch(`/tipos-certificacion/${tipo.id}/alternar`, {}, { preserveScroll: true });
 }

@@ -24,6 +24,7 @@ const reporteFiltros = ref({
     usuario_id: '',
 });
 
+// Arma la URL del PDF solo con los filtros que tengan valor
 const urlReporte = computed(() => {
     const parametros = new URLSearchParams();
     Object.entries(reporteFiltros.value).forEach(([clave, valor]) => {
@@ -33,6 +34,7 @@ const urlReporte = computed(() => {
     return `/bitacora-accesos/reporte${query ? `?${query}` : ''}`;
 });
 
+// Pide el listado al backend manteniendo el orden actual
 function filtrar() {
     router.get('/bitacora-accesos', {
         usuario_id: usuarioId.value,
@@ -47,6 +49,7 @@ function filtrar() {
     });
 }
 
+// Pide al backend ordenar por esa columna, invirtiendo la dirección si ya se estaba usando
 function ordenarPor(columna) {
     const direccion = (props.filtros.orden === columna && props.filtros.direccion === 'asc') ? 'desc' : 'asc';
 

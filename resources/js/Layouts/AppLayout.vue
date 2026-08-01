@@ -77,6 +77,7 @@ const itemsMenu = [
     },
 ];
 
+// Filtra los ítems del menú según el rol/permisos del usuario autenticado
 const menuVisible = computed(() =>
     itemsMenu.filter((item) => {
         if (item.soloAdministrador) {
@@ -87,6 +88,7 @@ const menuVisible = computed(() =>
     }),
 );
 
+// Bitácoras también marca activo cuando se está en el detalle de accesos
 const estaActivo = (href) => {
     if (href === '/bitacoras' && pagina.url.startsWith('/bitacora-accesos')) {
         return true;

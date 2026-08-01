@@ -21,10 +21,12 @@ const form = useForm({
     manual: null,
 });
 
+// Toma el primer archivo elegido, o null si el usuario canceló la selección
 function alSeleccionarArchivo(evento) {
     form.manual = evento.target.files[0] ?? null;
 }
 
+// Sube el PDF y limpia el input al terminar
 function subirManual() {
     form.post('/ayuda/manual', {
         forceFormData: true,

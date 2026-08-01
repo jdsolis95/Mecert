@@ -13,6 +13,7 @@ const form = useForm({
     nombre: props.etiqueta?.nombre ?? '',
 });
 
+// Mismo formulario para crear y editar; decide el verbo/endpoint según si ya existe la etiqueta
 function guardar() {
     if (esEdicion.value) {
         form.put(`/etiquetas/${props.etiqueta.id}`);
