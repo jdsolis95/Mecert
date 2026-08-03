@@ -1,10 +1,19 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link, router } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 import { Pencil, Trash2 } from 'lucide-vue-next';
 
-defineProps({
+const props = defineProps({
     roles: Array,
+});
+
+const busqueda = ref('');
+
+// Filtra en el cliente por nombre de rol, sin volver a pedir el listado al servidor
+const rolesFiltrados = computed(() => {
+    const termino = busqueda.value.trim().toLowerCase();
+    return props.roles.filter((rol) => !termino || rol.nombre.toLowerCase().includes(termino));
 });
 
 // Confirma antes de eliminar; el backend igual bloquea roles base o con usuarios asignados
@@ -34,7 +43,16 @@ function eliminar(rol) {
                 </Link>
             </div>
 
-            <table class="w-full border-collapse bg-white shadow rounded">
+            <div class="mb-4">
+                <input v-model="busqueda" type="text" placeholder="Buscar por nombre..."
+                    class="flex-1 min-w-[200px] border rounded p-2 text-sm" />
+            </div>
+
+            <div v-if="rolesFiltrados.length === 0" class="text-center text-gray-400 py-12">
+                No hay roles que coincidan con la búsqueda.
+            </div>
+
+            <table v-else class="w-full border-collapse bg-white shadow rounded">
                 <thead class="bg-gray-100">
                     <tr>
                         <th class="p-3 text-left text-sm">Rol</th>
@@ -44,7 +62,7 @@ function eliminar(rol) {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="rol in roles" :key="rol.id"
+                    <tr v-for="rol in rolesFiltrados" :key="rol.id"
                         :class="rol.cantidad_usuarios === 0 ? 'text-gray-400' : ''"
                         class="border-t even:bg-gray-50 hover:bg-gray-100">
                         <td class="p-3 text-sm font-medium">
