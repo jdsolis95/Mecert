@@ -26,9 +26,8 @@ const submit = () => {
         <Head title="Recuperar Contraseña" />
 
         <div class="mb-4 text-sm text-gray-600">
-            ¿Olvidaste tu contraseña? No hay problema. Solo indícanos tu
-            correo electrónico y te enviaremos un enlace para restablecer tu
-            contraseña y elegir una nueva.
+            Indica tu correo electrónico y te enviaremos un enlace
+            para restablecer tu contraseña y crear una nueva.
         </div>
 
         <div
