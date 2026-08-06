@@ -58,7 +58,7 @@ function guardar() {
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">Etiquetas (Fabricante)</label>
+                    <label class="block text-sm font-medium mb-1">Etiquetas (Fabricante/Tecnología)</label>
                     <div v-if="etiquetasDisponibles.length" class="grid grid-cols-2 gap-2 border rounded p-3">
                         <label v-for="etiqueta in etiquetasDisponibles" :key="etiqueta.id"
                             class="flex items-center gap-2 text-sm capitalize">
